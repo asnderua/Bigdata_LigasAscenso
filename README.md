@@ -10,4 +10,10 @@ Crea y asigna los permisos necesarios a los usuarios de base de datos para asegu
 5. Configurar Visual Studio (SSIS):
 Abre el proyecto de Integration Services y actualiza los administradores de conexiones (Origen y Destino) para que apunten a tus bases de datos locales.
 
+6. Cargar la Capa Staging:
+Configura el flujo de datos para extraer la información, agruparla y cargarla en la tabla temporal de prueba (stg_ligas_ascenso).
+
+7. Alimentar las Dimensiones:
+Una vez cargada la capa staging, configura y ejecuta las 5 tareas de flujo de datos que alimentarán el modelo: DIM_Tiempo, DIM_Partido, DIM_Ubicacion, DIM_Estadio y DIM_TipodeEntrada.
+
 
