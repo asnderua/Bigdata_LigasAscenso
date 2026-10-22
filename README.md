@@ -21,3 +21,6 @@ Una vez cargada la capa staging, configura y ejecuta las 5 tareas de flujo de da
 
 8. Cargar la Tabla de Hechos:
 Configura la tarea final que toma los datos preparados en staging, los cruza con las dimensiones y carga la información consolidada en el DW.
+
+9. Ejecutar Paquetes y Documentar:
+Inicia la ejecución del paquete SSIS completo. Revisa la pestaña de progreso y registra las capturas/evidencias para validar que la carga fue exitosa.
