@@ -18,3 +18,6 @@ Configura el flujo de datos para extraer la información, agruparla y cargarla e
 
 7. Alimentar las Dimensiones:
 Una vez cargada la capa staging, configura y ejecuta las 5 tareas de flujo de datos que alimentarán el modelo: DIM_Tiempo, DIM_Partido, DIM_Ubicacion, DIM_Estadio y DIM_TipodeEntrada.
+
+8. Cargar la Tabla de Hechos:
+Configura la tarea final que toma los datos preparados en staging, los cruza con las dimensiones y carga la información consolidada en el DW.
