@@ -13,7 +13,6 @@ Abre el proyecto de Integration Services y actualiza los administradores de cone
 6. Cargar la Capa Staging:
 Configura el flujo de datos para extraer la información, agruparla y cargarla en la tabla temporal de prueba (stg_ligas_ascenso).
 
-7. Alimentar las Dimensiones:
-Una vez cargada la capa staging, configura y ejecuta las 5 tareas de flujo de datos que alimentarán el modelo: DIM_Tiempo, DIM_Partido, DIM_Ubicacion, DIM_Estadio y DIM_TipodeEntrada.
+
 
 
