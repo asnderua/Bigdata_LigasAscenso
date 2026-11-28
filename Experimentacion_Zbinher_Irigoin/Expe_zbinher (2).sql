@@ -1,6 +1,0 @@
-USE [Staging_Ligas];
-GO
-
-ALTER TABLE dbo.stg_Boletos
-REBUILD PARTITION = ALL
-WITH (DATA_COMPRESSION = PAGE);
