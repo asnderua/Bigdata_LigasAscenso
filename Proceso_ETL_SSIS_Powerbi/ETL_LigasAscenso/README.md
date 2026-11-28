@@ -1,18 +1,63 @@
-# ETL de Ligas de Ascenso
+#ETL de Ligas de Ascenso 
 
-Este proyecto carga seis dimensiones y dos tablas de hechos en `DW_LigasdeAscenso`. `FactVentas` contiene una fila por partido y tipo de entrada con ventas pagadas. `FactAsistencia` contiene una fila por partido y admite medidas nulas cuando todavía no hay registro. `dbo.vw_KPI_PorPartido` agrega las ventas antes de combinarlas con la asistencia.
+Este proyecto implementa el flujo de extracción, transformación y carga (ETL) para la plataforma de Inteligencia de Negocios y Análisis de Taquilla del Fútbol de Ascenso Peruano. El proceso extrae la información transaccional, la consolida en una base de datos intermedia (Staging), alimenta seis dimensiones y puebla dos tablas de hechos dentro de DW_LigasdeAscenso.
 
-## Ejecutar en tu PC
+# Arquitectura y Estructura del Data Warehouse
 
-1. Abre `ETL_LigasAscenso.slnx` con Visual Studio y la extensión **SQL Server Integration Services Projects 2022+**. El proyecto apunta a SQL Server 2025 y usa el controlador OLE DB 18 de 64 bits (`MSOLEDBSQL)). [Extensión para Visual Studio](https://marketplace.visualstudio.com/items?itemName=SSIS.MicrosoftDataToolsIntegrationServices)
-2. En `Project.params`, configura `ServidorOrigen` y `ServidorDWStaging` con los nombres de instancia que funcionan en SSMS. Los valores de base esperados son `BaseOrigen=LigasdeAscenso`, `BaseStaging=Staging_Ligas` y `BaseDW=DW_LigasdeAscenso`. Staging y DW deben compartir instancia. La conexión `CM_DWNEW` usa autenticación integrada de Windows y conserva la sesión entre las tareas de carga.
-3. Ejecuta `Package.dtsx` completo. El paquete vuelve a llenar las tres tablas de staging, carga las seis dimensiones y ejecuta **Cargar FactVentas** y **Cargar FactAsistencia**. Las cargas del DW se confirman juntas al finalizar la segunda FACT.
-4. En SSMS, ejecuta `SQL_ETL/Verificar_ETL.sql`. Con los datos originales de ejemplo se esperan 16 filas de ventas, 14 filas de asistencia, 16 boletos pagados, S/ 485,00 y 41 400 asistentes registrados. Repite el paquete para comprobar que los totales se mantengan.
+Base de Datos Origen (OLTP): LigasdeAscenso
 
-## Instalar las bases en otra PC
+Base de Datos Intermedia (Staging): Staging_Ligas (dbo.stg_Partidos, dbo.stg_Boletos, dbo.stg_Asistencia)
 
-En una instancia de prueba nueva, ejecuta los scripts de la carpeta `SQL` en orden: `01_Origen_LigasdeAscenso.sql`, `02_Staging_Ligas.sql` y `03_DW_ligasdeAscenso_new.sql`. Para una prueba con una instancia ya configurada, usa las tres bases existentes de este proyecto. El DW debe tener `dbo.FactVentas` y `dbo.FactAsistencia` antes de ejecutar el paquete. El motor debe admitir una intercalación de página de códigos 1252 en las columnas VARCHAR de origen y staging. Ejecuta Visual Studio con una cuenta autorizada a leer origen y staging, escribir staging y cargar el DW.
+Data Warehouse (OLAP): DW_LigasdeAscenso
 
-## SQL del ETL
+Dimensiones: DimTiempo, DimTemporada, DimEstadio, DimCompeticion, DimTipoEntrada, DimClub
 
-Los archivos `Extraer_*.sql` reproducen las consultas de extracción. `SQL_ETL/Cargar_DW.sql` contiene la carga de ambas FACT y de las seis dimensiones desde staging en una sola transacción. Úsalo solo si necesitas probar manualmente la fase DW después de llenar staging. El archivo `SQL_ETL/Verificar_ETL.sql` solo consulta resultados. Los comandos normales de carga ya están dentro del paquete SSIS.
+Tablas de Hechos:
+
+FactVentas: Granularidad por Partido y Tipo de Entrada (filtra únicamente boletos con EstadoPago = 'Pagado').
+
+FactAsistencia: Granularidad por Partido (registra asistencia física a estadios).
+
+Vista Analítica: dbo.vw_KPI_PorPartido (consolida agregaciones monetarias y asistencia antes de la capa de visualización).
+
+# Requisitos y Conexión
+
+IDE: Visual Studio 2022 con la extensión SQL Server Integration Services Projects 2022+.
+
+Motor BD: SQL Server Management Studio (SSMS) 2019 / 2022 / 2025 (Driver MSOLEDBSQL / OLE DB Provider).
+
+Autenticación: Autenticación Integrada de Windows local (HP\Usuario / sesión activa). Cadenas de conexión OLE DB configuradas en los administradores: CM_Origen, CM_Staging y CM_DWNEW.
+
+# Pasos para Ejecutar en tu PC
+
+Instalación de Bases de Datos:
+En caso de estar en una instancia nueva, ejecuta en SSMS los scripts de la carpeta SQL en el siguiente orden estricto:
+
+SQL/01_Origen_LigasdeAscenso.sql
+
+SQL/02_Staging_Ligas.sql
+
+SQL/03_DW_ligasdeAscenso_new.sql
+
+Configuración de Parámetros:
+Abre la solución ETL_LigasAscenso.slnx en Visual Studio. Verifica en Project.params que los nombres de servidor apunten a tu instancia local ((local) o localhost) y que los nombres de las tres bases coincidan:
+
+BaseOrigen = LigasdeAscenso
+
+BaseStaging = Staging_Ligas
+
+BaseDW = DW_LigasdeAscenso
+
+#Ejecución del Paquete SSIS:
+Abre y ejecuta Package.dtsx en modo depuración (F5). El paquete ejecutará en orden de precedencia:
+
+Fase 1: Limpieza y preparación de las tablas de staging y de hechos (Preparar staging / Liberar staging).
+
+Fase 2: Extracción transaccional y carga hacia Staging_Ligas (Extraer Partidos, Extraer Boletos, Extraer Asistencia).
+
+Fase 3: Carga secuencial de las seis dimensiones en DW_LigasdeAscenso.
+
+Fase 4: ExecSQL de carga final para FactVentas y FactAsistencia.
+
+Validación de Resultados e Idempotencia:
+Abre SSMS y ejecuta el script SQL_ETL/Verificar_ETL.sql. El script realiza una consulta UNION ALL para verificar la paridad entre las filas agregadas en staging y los hechos/dimensiones poblados en el DW. Puedes volver a ejecutar el paquete SSIS cuantas veces requieras para validar que los totales monetarios y de boletos se mantengan constantes.
