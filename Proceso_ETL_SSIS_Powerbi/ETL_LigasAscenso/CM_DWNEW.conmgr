@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts" DTS:ObjectName="CM_DWNEW" DTS:DTSID="{A9894B2F-66FE-4BB2-8D12-38C29CE8F6AF}" DTS:CreationName="OLEDB">
+  <DTS:PropertyExpression DTS:Name="ConnectionString">"Provider=MSOLEDBSQL;Data Source=" + @[$Project::ServidorDWStaging] + ";Initial Catalog=" + @[$Project::BaseDW] + ";Integrated Security=SSPI;Auto Translate=False;"</DTS:PropertyExpression>
+  <DTS:ObjectData>
+    <DTS:ConnectionManager DTS:ConnectRetryCount="1" DTS:ConnectRetryInterval="5" DTS:ConnectionString="Provider=MSOLEDBSQL;Data Source=(local);Initial Catalog=DW_LigasdeAscenso;Integrated Security=SSPI;Auto Translate=False;" DTS:Retain="True" />
+  </DTS:ObjectData>
+</DTS:ConnectionManager>

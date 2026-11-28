@@ -1,0 +1,852 @@
+<?xml version='1.0' encoding='utf-8'?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" DTS:refId="Package" DTS:CreationDate="11/17/2026 1:10:59 PM" DTS:CreationName="Microsoft.Package" DTS:CreatorComputerName="HP" DTS:CreatorName="HP\Usuario" DTS:DTSID="{37B72EE6-FEE4-42FC-B239-8E4D0314BCDE}" DTS:ExecutableType="Microsoft.Package" DTS:LastModifiedProductVersion="17.0.1016.0" DTS:LocaleID="10250" DTS:ObjectName="Package" DTS:PackageType="5" DTS:VersionGUID="{ECB2A5AD-6812-4F01-BAC0-7E9DE09AA650}" DTS:ProtectionLevel="0" DTS:DelayValidation="True" DTS:MaxConcurrentExecutables="1">
+  <DTS:Property DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:Variables />
+  <DTS:Executables>
+    <DTS:Executable DTS:refId="Package\Preparar staging" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:DTSID="{F67FE674-2132-44F2-9232-E3D28C9AE789}" DTS:ObjectName="Preparar staging" DTS:DelayValidation="True" DTS:LocaleID="-1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData SQLTask:Connection="{AB120B29-1A2E-4C16-A2CC-3ABC748CD459}" SQLTask:BypassPrepare="True" SQLTask:SqlStatementSource="SET NOCOUNT ON;&#10;SET XACT_ABORT ON;&#10;DECLARE @LockResult int;&#10;EXEC @LockResult = sys.sp_getapplock&#10;    @Resource = N'ETL_LigasAscenso.Staging', @LockMode = 'Exclusive',&#10;    @LockOwner = 'Session', @LockTimeout = 60000;&#10;IF @LockResult &lt; 0 THROW 51000, 'No se consiguió el bloqueo de staging.', 1;&#10;BEGIN TRANSACTION;&#10;DELETE FROM dbo.stg_Asistencia;&#10;DELETE FROM dbo.stg_Boletos;&#10;DELETE FROM dbo.stg_Partidos;&#10;COMMIT TRANSACTION;" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Extraer Partidos" DTS:CreationName="Microsoft.Pipeline" DTS:ExecutableType="Microsoft.Pipeline" DTS:DTSID="{3C206C20-84B8-4AEB-AE2D-10A4ED0D8C4F}" DTS:ObjectName="Extraer Partidos" DTS:DelayValidation="True" DTS:LocaleID="-1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <pipeline version="1">
+          <components>
+            <component refId="Package\Extraer Partidos\Destino de OLE DB" componentClassID="Microsoft.OLEDBDestination" contactInfo="Destino de OLE DB;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; Todos los derechos reservados; http://www.microsoft.com/sql/support;4" description="Destino de OLE DB" name="Destino de OLE DB" usesDispositions="true" version="4" validateExternalMetadata="false">
+              <properties>
+                <property dataType="System.Int32" description="Número de segundos antes de que se agote el tiempo de espera de un comando. Un valor de 0 indica un tiempo de espera infinito." name="CommandTimeout">0</property>
+                <property dataType="System.String" description="Especifica el nombre del objeto de base de datos usado para abrir un conjunto de filas." name="OpenRowset">[dbo].[stg_Partidos]</property>
+                <property dataType="System.String" description="Especifica la variable que contiene el nombre del objeto de base de datos usado para abrir un conjunto de filas." name="OpenRowsetVariable" />
+                <property dataType="System.String" description="Comando SQL para ejecutar." name="SqlCommand" UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor" />
+                <property dataType="System.Int32" description="Especifica la página de códigos de columna para utilizar cuando la información de página de códigos no está disponible en el origen de datos." name="DefaultCodePage">1252</property>
+                <property dataType="System.Boolean" description="Fuerza el uso del valor de la propiedad DefaultCodePage al describir datos de caracteres." name="AlwaysUseDefaultCodePage">false</property>
+                <property dataType="System.Int32" description="Especifica el modo utilizado para obtener acceso a la base de datos." name="AccessMode" typeConverter="AccessMode">3</property>
+                <property dataType="System.Boolean" description="Indica si los valores proporcionados para columnas de identidad se van a copiar al destino. Si es False, los valores de las columnas de identidad se generan automáticamente en el destino. Solo se aplica si está activada la carga rápida." name="FastLoadKeepIdentity">false</property>
+                <property dataType="System.Boolean" description="Indica si las columnas que contienen NULL tendrán NULL insertado en el destino. Si es False, las columnas que contienen NULL tendrán sus valores predeterminados insertados en el destino. Solo se aplica si está activada la carga rápida." name="FastLoadKeepNulls">true</property>
+                <property dataType="System.String" description="Especifica opciones para usar con la carga rápida. Solo se aplica si está activada la carga rápida." name="FastLoadOptions">TABLOCK,CHECK_CONSTRAINTS</property>
+                <property dataType="System.Int32" description="Especifica cuándo se emiten confirmaciones durante la inserción de datos. El valor 0 especifica que se emitirá una confirmación al final de la inserción de datos. Solo se aplica si está activada la carga rápida." name="FastLoadMaxInsertCommitSize">0</property>
+              </properties>
+              <connections>
+                <connection refId="Package\Extraer Partidos\Destino de OLE DB.Connections[OleDbConnection]" connectionManagerID="{AB120B29-1A2E-4C16-A2CC-3ABC748CD459}:external" connectionManagerRefId="Project.ConnectionManagers[CM_Staging]" description="La conexión de tiempo de ejecución OLE DB usada para obtener acceso a la base de datos." name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB]" errorOrTruncationOperation="Insertar" errorRowDisposition="FailComponent" hasSideEffects="true" name="Entrada de destino de OLE DB">
+                  <inputColumns>
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[IDPartidoOrigen]" cachedName="IDPartidoOrigen" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDPartidoOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDPartidoOrigen]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[IDTemporadaOrigen]" cachedName="IDTemporadaOrigen" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDTemporadaOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDTemporadaOrigen]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[AnioTemporada]" cachedName="AnioTemporada" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[AnioTemporada]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AnioTemporada]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[FechaInicioTemporada]" cachedName="FechaInicioTemporada" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[FechaInicioTemporada]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FechaInicioTemporada]" cachedDataType="dbDate" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[FechaFinTemporada]" cachedName="FechaFinTemporada" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[FechaFinTemporada]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FechaFinTemporada]" cachedDataType="dbDate" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[IDEtapaOrigen]" cachedName="IDEtapaOrigen" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDEtapaOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDEtapaOrigen]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[IDCompeticionOrigen]" cachedName="IDCompeticionOrigen" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDCompeticionOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDCompeticionOrigen]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[NombreCompeticion]" cachedName="NombreCompeticion" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NombreCompeticion]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreCompeticion]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[Organizador]" cachedName="Organizador" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[Organizador]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[Organizador]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[NivelCompeticion]" cachedName="NivelCompeticion" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NivelCompeticion]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NivelCompeticion]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[NombreEtapa]" cachedName="NombreEtapa" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NombreEtapa]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreEtapa]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[NivelEtapa]" cachedName="NivelEtapa" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NivelEtapa]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NivelEtapa]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[FactorPrecio]" cachedName="FactorPrecio" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[FactorPrecio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FactorPrecio]" cachedDataType="numeric" cachedPrecision="10" cachedScale="2" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[IDEstadioOrigen]" cachedName="IDEstadioOrigen" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDEstadioOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDEstadioOrigen]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[NombreEstadio]" cachedName="NombreEstadio" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NombreEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreEstadio]" cachedDataType="str" cachedLength="100" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[DepartamentoEstadio]" cachedName="DepartamentoEstadio" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[DepartamentoEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[DepartamentoEstadio]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[ProvinciaEstadio]" cachedName="ProvinciaEstadio" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[ProvinciaEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[ProvinciaEstadio]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[DistritoEstadio]" cachedName="DistritoEstadio" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[DistritoEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[DistritoEstadio]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[RegionEstadio]" cachedName="RegionEstadio" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[RegionEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[RegionEstadio]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[CategoriaEstadio]" cachedName="CategoriaEstadio" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[CategoriaEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[CategoriaEstadio]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[MaxAforo]" cachedName="MaxAforo" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[MaxAforo]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[MaxAforo]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[IDClubLocalOrigen]" cachedName="IDClubLocalOrigen" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDClubLocalOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDClubLocalOrigen]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[NombreClubLocal]" cachedName="NombreClubLocal" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NombreClubLocal]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreClubLocal]" cachedDataType="str" cachedLength="100" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[DepartamentoClubLocal]" cachedName="DepartamentoClubLocal" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[DepartamentoClubLocal]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[DepartamentoClubLocal]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[ProvinciaClubLocal]" cachedName="ProvinciaClubLocal" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[ProvinciaClubLocal]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[ProvinciaClubLocal]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[AnioFundacionLocal]" cachedName="AnioFundacionLocal" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[AnioFundacionLocal]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AnioFundacionLocal]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[IDClubVisitaOrigen]" cachedName="IDClubVisitaOrigen" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDClubVisitaOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDClubVisitaOrigen]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[NombreClubVisita]" cachedName="NombreClubVisita" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NombreClubVisita]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreClubVisita]" cachedDataType="str" cachedLength="100" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[DepartamentoClubVisita]" cachedName="DepartamentoClubVisita" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[DepartamentoClubVisita]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[DepartamentoClubVisita]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[ProvinciaClubVisita]" cachedName="ProvinciaClubVisita" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[ProvinciaClubVisita]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[ProvinciaClubVisita]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[AnioFundacionVisita]" cachedName="AnioFundacionVisita" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[AnioFundacionVisita]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AnioFundacionVisita]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[FechaHoraPartido]" cachedName="FechaHoraPartido" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[FechaHoraPartido]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FechaHoraPartido]" cachedDataType="dbTimeStamp2" cachedScale="0" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[Jornada]" cachedName="Jornada" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[Jornada]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[Jornada]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[EstadoPartido]" cachedName="EstadoPartido" externalMetadataColumnId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[EstadoPartido]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[EstadoPartido]" cachedDataType="str" cachedLength="20" cachedCodepage="1252" />
+                  </inputColumns>
+                  <externalMetadataColumns isUsed="True">
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDPartidoOrigen]" name="IDPartidoOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDTemporadaOrigen]" name="IDTemporadaOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[AnioTemporada]" name="AnioTemporada" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[FechaInicioTemporada]" name="FechaInicioTemporada" dataType="dbDate" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[FechaFinTemporada]" name="FechaFinTemporada" dataType="dbDate" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDEtapaOrigen]" name="IDEtapaOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDCompeticionOrigen]" name="IDCompeticionOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NombreCompeticion]" name="NombreCompeticion" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[Organizador]" name="Organizador" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NivelCompeticion]" name="NivelCompeticion" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NombreEtapa]" name="NombreEtapa" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NivelEtapa]" name="NivelEtapa" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[FactorPrecio]" name="FactorPrecio" dataType="numeric" precision="10" scale="2" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDEstadioOrigen]" name="IDEstadioOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NombreEstadio]" name="NombreEstadio" dataType="str" length="100" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[DepartamentoEstadio]" name="DepartamentoEstadio" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[ProvinciaEstadio]" name="ProvinciaEstadio" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[DistritoEstadio]" name="DistritoEstadio" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[RegionEstadio]" name="RegionEstadio" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[CategoriaEstadio]" name="CategoriaEstadio" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[MaxAforo]" name="MaxAforo" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDClubLocalOrigen]" name="IDClubLocalOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NombreClubLocal]" name="NombreClubLocal" dataType="str" length="100" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[DepartamentoClubLocal]" name="DepartamentoClubLocal" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[ProvinciaClubLocal]" name="ProvinciaClubLocal" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[AnioFundacionLocal]" name="AnioFundacionLocal" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDClubVisitaOrigen]" name="IDClubVisitaOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NombreClubVisita]" name="NombreClubVisita" dataType="str" length="100" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[DepartamentoClubVisita]" name="DepartamentoClubVisita" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[ProvinciaClubVisita]" name="ProvinciaClubVisita" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[AnioFundacionVisita]" name="AnioFundacionVisita" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[FechaHoraPartido]" name="FechaHoraPartido" dataType="dbTimeStamp2" scale="0" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[Jornada]" name="Jornada" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[EstadoPartido]" name="EstadoPartido" dataType="str" length="20" codePage="1252" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output refId="Package\Extraer Partidos\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB]" exclusionGroup="1" isErrorOut="true" name="Salida de error de destino de OLE DB" synchronousInputId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB]">
+                  <outputColumns>
+                    <outputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorCode]" dataType="i4" lineageId="Package\Extraer Partidos\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorCode]" name="ErrorCode" specialFlags="1" />
+                    <outputColumn refId="Package\Extraer Partidos\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorColumn]" dataType="i4" lineageId="Package\Extraer Partidos\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorColumn]" name="ErrorColumn" specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component refId="Package\Extraer Partidos\Origen de OLE DB" componentClassID="Microsoft.OLEDBSource" contactInfo="Origen de OLE DB;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; Todos los derechos reservados; http://www.microsoft.com/sql/support;7" description="Origen de OLE DB" name="Origen de OLE DB" usesDispositions="true" version="7" validateExternalMetadata="false">
+              <properties>
+                <property dataType="System.Int32" description="Número de segundos antes de que se agote el tiempo de espera de un comando. Un valor de 0 indica un tiempo de espera infinito." name="CommandTimeout">0</property>
+                <property dataType="System.String" description="Especifica el nombre del objeto de base de datos usado para abrir un conjunto de filas." name="OpenRowset" />
+                <property dataType="System.String" description="Especifica la variable que contiene el nombre del objeto de base de datos usado para abrir un conjunto de filas." name="OpenRowsetVariable" />
+                <property dataType="System.String" description="Comando SQL para ejecutar." name="SqlCommand" UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT
+    p.IDpartido AS [IDPartidoOrigen],
+    t.IDtemporada AS [IDTemporadaOrigen],
+    t.Anio AS [AnioTemporada],
+    t.FechaInicio AS [FechaInicioTemporada],
+    t.FechaFinal AS [FechaFinTemporada],
+    e.IDetapa AS [IDEtapaOrigen],
+    c.IDcompeticion AS [IDCompeticionOrigen],
+    c.NombreCompeticion AS [NombreCompeticion],
+    c.Organizador AS [Organizador],
+    c.Nivelcompeticion AS [NivelCompeticion],
+    e.nombreEtapa AS [NombreEtapa],
+    e.nivelEtapa AS [NivelEtapa],
+    CAST(e.FactorPrecio AS decimal(10,2)) AS [FactorPrecio],
+    es.IDestadio AS [IDEstadioOrigen],
+    es.NombreEstadio AS [NombreEstadio],
+    ue.Departamento AS [DepartamentoEstadio],
+    ue.Provincia AS [ProvinciaEstadio],
+    ue.Distrito AS [DistritoEstadio],
+    ue.Region AS [RegionEstadio],
+    es.Categoria AS [CategoriaEstadio],
+    es.MaxAforo AS [MaxAforo],
+    l.IDclub AS [IDClubLocalOrigen],
+    l.NombreClub AS [NombreClubLocal],
+    ul.Departamento AS [DepartamentoClubLocal],
+    ul.Provincia AS [ProvinciaClubLocal],
+    l.AnioFundacion AS [AnioFundacionLocal],
+    v.IDclub AS [IDClubVisitaOrigen],
+    v.NombreClub AS [NombreClubVisita],
+    uv.Departamento AS [DepartamentoClubVisita],
+    uv.Provincia AS [ProvinciaClubVisita],
+    v.AnioFundacion AS [AnioFundacionVisita],
+    p.FechaHora AS [FechaHoraPartido],
+    p.Jornada AS [Jornada],
+    p.EstadoPartido AS [EstadoPartido]
+FROM dbo.Partido AS p
+JOIN dbo.temporada AS t ON t.IDtemporada = p.IDtemporada
+JOIN dbo.Etapas AS e ON e.IDetapa = p.IDetapa
+JOIN dbo.Competicion AS c ON c.IDcompeticion = e.IDcompeticion
+JOIN dbo.Estadio AS es ON es.IDestadio = p.IDestadio
+JOIN dbo.Ubicacion AS ue ON ue.IDubicacion = es.IDubicacion
+JOIN dbo.Club AS l ON l.IDclub = p.IDequipoLocal
+JOIN dbo.Ubicacion AS ul ON ul.IDubicacion = l.IDubicacion
+JOIN dbo.Club AS v ON v.IDclub = p.IDequipoVisitante
+JOIN dbo.Ubicacion AS uv ON uv.IDubicacion = v.IDubicacion;</property>
+                <property dataType="System.String" description="Variable que contiene el comando SQL para ejecutar." name="SqlCommandVariable" />
+                <property dataType="System.Int32" description="Especifica la página de códigos de columna para utilizar cuando la información de página de códigos no está disponible en el origen de datos." name="DefaultCodePage">1252</property>
+                <property dataType="System.Boolean" description="Fuerza el uso del valor de la propiedad DefaultCodePage al describir datos de caracteres." name="AlwaysUseDefaultCodePage">false</property>
+                <property dataType="System.Int32" description="Especifica el modo utilizado para obtener acceso a la base de datos." name="AccessMode" typeConverter="AccessMode">2</property>
+                <property dataType="System.String" description="Asignaciones entre los parámetros del comando SQL y las variables." name="ParameterMapping" />
+              </properties>
+              <connections>
+                <connection refId="Package\Extraer Partidos\Origen de OLE DB.Connections[OleDbConnection]" connectionManagerID="{9872018A-2CA8-4F51-84C3-65ECEA8BA843}:external" connectionManagerRefId="Project.ConnectionManagers[CM_Origen]" description="La conexión de tiempo de ejecución OLE DB usada para obtener acceso a la base de datos." name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB]" name="Salida de origen de OLE DB">
+                  <outputColumns>
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDPartidoOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDPartidoOrigen]" name="IDPartidoOrigen" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDPartidoOrigen]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDTemporadaOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDTemporadaOrigen]" name="IDTemporadaOrigen" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDTemporadaOrigen]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AnioTemporada]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AnioTemporada]" name="AnioTemporada" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[AnioTemporada]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FechaInicioTemporada]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FechaInicioTemporada]" name="FechaInicioTemporada" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[FechaInicioTemporada]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="dbDate" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FechaFinTemporada]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FechaFinTemporada]" name="FechaFinTemporada" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[FechaFinTemporada]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="dbDate" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDEtapaOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDEtapaOrigen]" name="IDEtapaOrigen" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDEtapaOrigen]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDCompeticionOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDCompeticionOrigen]" name="IDCompeticionOrigen" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDCompeticionOrigen]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreCompeticion]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreCompeticion]" name="NombreCompeticion" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NombreCompeticion]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[Organizador]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[Organizador]" name="Organizador" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[Organizador]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NivelCompeticion]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NivelCompeticion]" name="NivelCompeticion" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NivelCompeticion]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreEtapa]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreEtapa]" name="NombreEtapa" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NombreEtapa]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NivelEtapa]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NivelEtapa]" name="NivelEtapa" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NivelEtapa]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FactorPrecio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FactorPrecio]" name="FactorPrecio" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[FactorPrecio]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="numeric" precision="10" scale="2" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDEstadioOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDEstadioOrigen]" name="IDEstadioOrigen" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDEstadioOrigen]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreEstadio]" name="NombreEstadio" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NombreEstadio]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="100" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[DepartamentoEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[DepartamentoEstadio]" name="DepartamentoEstadio" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[DepartamentoEstadio]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[ProvinciaEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[ProvinciaEstadio]" name="ProvinciaEstadio" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[ProvinciaEstadio]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[DistritoEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[DistritoEstadio]" name="DistritoEstadio" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[DistritoEstadio]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[RegionEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[RegionEstadio]" name="RegionEstadio" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[RegionEstadio]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[CategoriaEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[CategoriaEstadio]" name="CategoriaEstadio" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[CategoriaEstadio]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[MaxAforo]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[MaxAforo]" name="MaxAforo" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[MaxAforo]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDClubLocalOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDClubLocalOrigen]" name="IDClubLocalOrigen" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDClubLocalOrigen]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreClubLocal]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreClubLocal]" name="NombreClubLocal" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NombreClubLocal]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="100" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[DepartamentoClubLocal]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[DepartamentoClubLocal]" name="DepartamentoClubLocal" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[DepartamentoClubLocal]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[ProvinciaClubLocal]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[ProvinciaClubLocal]" name="ProvinciaClubLocal" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[ProvinciaClubLocal]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AnioFundacionLocal]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AnioFundacionLocal]" name="AnioFundacionLocal" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[AnioFundacionLocal]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDClubVisitaOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDClubVisitaOrigen]" name="IDClubVisitaOrigen" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDClubVisitaOrigen]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreClubVisita]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreClubVisita]" name="NombreClubVisita" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NombreClubVisita]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="100" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[DepartamentoClubVisita]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[DepartamentoClubVisita]" name="DepartamentoClubVisita" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[DepartamentoClubVisita]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[ProvinciaClubVisita]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[ProvinciaClubVisita]" name="ProvinciaClubVisita" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[ProvinciaClubVisita]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AnioFundacionVisita]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AnioFundacionVisita]" name="AnioFundacionVisita" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[AnioFundacionVisita]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FechaHoraPartido]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FechaHoraPartido]" name="FechaHoraPartido" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[FechaHoraPartido]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="dbTimeStamp2" scale="0" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[Jornada]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[Jornada]" name="Jornada" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[Jornada]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[EstadoPartido]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[EstadoPartido]" name="EstadoPartido" externalMetadataColumnId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[EstadoPartido]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="20" codePage="1252" />
+                  </outputColumns>
+                  <externalMetadataColumns isUsed="True">
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDPartidoOrigen]" name="IDPartidoOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDTemporadaOrigen]" name="IDTemporadaOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[AnioTemporada]" name="AnioTemporada" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[FechaInicioTemporada]" name="FechaInicioTemporada" dataType="dbDate" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[FechaFinTemporada]" name="FechaFinTemporada" dataType="dbDate" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDEtapaOrigen]" name="IDEtapaOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDCompeticionOrigen]" name="IDCompeticionOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NombreCompeticion]" name="NombreCompeticion" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[Organizador]" name="Organizador" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NivelCompeticion]" name="NivelCompeticion" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NombreEtapa]" name="NombreEtapa" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NivelEtapa]" name="NivelEtapa" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[FactorPrecio]" name="FactorPrecio" dataType="numeric" precision="10" scale="2" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDEstadioOrigen]" name="IDEstadioOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NombreEstadio]" name="NombreEstadio" dataType="str" length="100" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[DepartamentoEstadio]" name="DepartamentoEstadio" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[ProvinciaEstadio]" name="ProvinciaEstadio" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[DistritoEstadio]" name="DistritoEstadio" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[RegionEstadio]" name="RegionEstadio" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[CategoriaEstadio]" name="CategoriaEstadio" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[MaxAforo]" name="MaxAforo" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDClubLocalOrigen]" name="IDClubLocalOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NombreClubLocal]" name="NombreClubLocal" dataType="str" length="100" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[DepartamentoClubLocal]" name="DepartamentoClubLocal" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[ProvinciaClubLocal]" name="ProvinciaClubLocal" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[AnioFundacionLocal]" name="AnioFundacionLocal" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDClubVisitaOrigen]" name="IDClubVisitaOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NombreClubVisita]" name="NombreClubVisita" dataType="str" length="100" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[DepartamentoClubVisita]" name="DepartamentoClubVisita" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[ProvinciaClubVisita]" name="ProvinciaClubVisita" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[AnioFundacionVisita]" name="AnioFundacionVisita" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[FechaHoraPartido]" name="FechaHoraPartido" dataType="dbTimeStamp2" scale="0" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[Jornada]" name="Jornada" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[EstadoPartido]" name="EstadoPartido" dataType="str" length="20" codePage="1252" />
+                  </externalMetadataColumns>
+                </output>
+                <output refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB]" isErrorOut="true" name="Salida de error de origen de OLE DB">
+                  <outputColumns>
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDPartidoOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDPartidoOrigen]" name="IDPartidoOrigen" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDTemporadaOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDTemporadaOrigen]" name="IDTemporadaOrigen" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[AnioTemporada]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[AnioTemporada]" name="AnioTemporada" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[FechaInicioTemporada]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[FechaInicioTemporada]" name="FechaInicioTemporada" dataType="dbDate" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[FechaFinTemporada]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[FechaFinTemporada]" name="FechaFinTemporada" dataType="dbDate" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDEtapaOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDEtapaOrigen]" name="IDEtapaOrigen" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDCompeticionOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDCompeticionOrigen]" name="IDCompeticionOrigen" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NombreCompeticion]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NombreCompeticion]" name="NombreCompeticion" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[Organizador]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[Organizador]" name="Organizador" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NivelCompeticion]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NivelCompeticion]" name="NivelCompeticion" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NombreEtapa]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NombreEtapa]" name="NombreEtapa" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NivelEtapa]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NivelEtapa]" name="NivelEtapa" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[FactorPrecio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[FactorPrecio]" name="FactorPrecio" dataType="numeric" precision="10" scale="2" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDEstadioOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDEstadioOrigen]" name="IDEstadioOrigen" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NombreEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NombreEstadio]" name="NombreEstadio" dataType="str" length="100" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[DepartamentoEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[DepartamentoEstadio]" name="DepartamentoEstadio" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ProvinciaEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ProvinciaEstadio]" name="ProvinciaEstadio" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[DistritoEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[DistritoEstadio]" name="DistritoEstadio" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[RegionEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[RegionEstadio]" name="RegionEstadio" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[CategoriaEstadio]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[CategoriaEstadio]" name="CategoriaEstadio" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[MaxAforo]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[MaxAforo]" name="MaxAforo" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDClubLocalOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDClubLocalOrigen]" name="IDClubLocalOrigen" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NombreClubLocal]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NombreClubLocal]" name="NombreClubLocal" dataType="str" length="100" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[DepartamentoClubLocal]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[DepartamentoClubLocal]" name="DepartamentoClubLocal" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ProvinciaClubLocal]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ProvinciaClubLocal]" name="ProvinciaClubLocal" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[AnioFundacionLocal]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[AnioFundacionLocal]" name="AnioFundacionLocal" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDClubVisitaOrigen]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDClubVisitaOrigen]" name="IDClubVisitaOrigen" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NombreClubVisita]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NombreClubVisita]" name="NombreClubVisita" dataType="str" length="100" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[DepartamentoClubVisita]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[DepartamentoClubVisita]" name="DepartamentoClubVisita" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ProvinciaClubVisita]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ProvinciaClubVisita]" name="ProvinciaClubVisita" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[AnioFundacionVisita]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[AnioFundacionVisita]" name="AnioFundacionVisita" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[FechaHoraPartido]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[FechaHoraPartido]" name="FechaHoraPartido" dataType="dbTimeStamp2" scale="0" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[Jornada]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[Jornada]" name="Jornada" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[EstadoPartido]" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[EstadoPartido]" name="EstadoPartido" dataType="str" length="20" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorCode]" dataType="i4" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorCode]" name="ErrorCode" specialFlags="1" />
+                    <outputColumn refId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorColumn]" dataType="i4" lineageId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorColumn]" name="ErrorColumn" specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path refId="Package\Extraer Partidos.Paths[Salida de origen de OLE DB]" endId="Package\Extraer Partidos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB]" name="Salida de origen de OLE DB" startId="Package\Extraer Partidos\Origen de OLE DB.Outputs[Salida de origen de OLE DB]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Extraer Boletos" DTS:CreationName="Microsoft.Pipeline" DTS:ExecutableType="Microsoft.Pipeline" DTS:DTSID="{A7EFA34C-860C-4035-9437-2DA22E85F5F0}" DTS:ObjectName="Extraer Boletos" DTS:DelayValidation="True" DTS:LocaleID="-1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <pipeline version="1">
+          <components>
+            <component refId="Package\Extraer Boletos\Destino de OLE DB" componentClassID="Microsoft.OLEDBDestination" contactInfo="Destino de OLE DB;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; Todos los derechos reservados; http://www.microsoft.com/sql/support;4" description="Destino de OLE DB" name="Destino de OLE DB" usesDispositions="true" version="4" validateExternalMetadata="false">
+              <properties>
+                <property dataType="System.Int32" description="Número de segundos antes de que se agote el tiempo de espera de un comando. Un valor de 0 indica un tiempo de espera infinito." name="CommandTimeout">0</property>
+                <property dataType="System.String" description="Especifica el nombre del objeto de base de datos usado para abrir un conjunto de filas." name="OpenRowset">[dbo].[stg_Boletos]</property>
+                <property dataType="System.String" description="Especifica la variable que contiene el nombre del objeto de base de datos usado para abrir un conjunto de filas." name="OpenRowsetVariable" />
+                <property dataType="System.String" description="Comando SQL para ejecutar." name="SqlCommand" UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor" />
+                <property dataType="System.Int32" description="Especifica la página de códigos de columna para utilizar cuando la información de página de códigos no está disponible en el origen de datos." name="DefaultCodePage">1252</property>
+                <property dataType="System.Boolean" description="Fuerza el uso del valor de la propiedad DefaultCodePage al describir datos de caracteres." name="AlwaysUseDefaultCodePage">false</property>
+                <property dataType="System.Int32" description="Especifica el modo utilizado para obtener acceso a la base de datos." name="AccessMode" typeConverter="AccessMode">3</property>
+                <property dataType="System.Boolean" description="Indica si los valores proporcionados para columnas de identidad se van a copiar al destino. Si es False, los valores de las columnas de identidad se generan automáticamente en el destino. Solo se aplica si está activada la carga rápida." name="FastLoadKeepIdentity">false</property>
+                <property dataType="System.Boolean" description="Indica si las columnas que contienen NULL tendrán NULL insertado en el destino. Si es False, las columnas que contienen NULL tendrán sus valores predeterminados insertados en el destino. Solo se aplica si está activada la carga rápida." name="FastLoadKeepNulls">true</property>
+                <property dataType="System.String" description="Especifica opciones para usar con la carga rápida. Solo se aplica si está activada la carga rápida." name="FastLoadOptions">TABLOCK,CHECK_CONSTRAINTS</property>
+                <property dataType="System.Int32" description="Especifica cuándo se emiten confirmaciones durante la inserción de datos. El valor 0 especifica que se emitirá una confirmación al final de la inserción de datos. Solo se aplica si está activada la carga rápida." name="FastLoadMaxInsertCommitSize">0</property>
+              </properties>
+              <connections>
+                <connection refId="Package\Extraer Boletos\Destino de OLE DB.Connections[OleDbConnection]" connectionManagerID="{AB120B29-1A2E-4C16-A2CC-3ABC748CD459}:external" connectionManagerRefId="Project.ConnectionManagers[CM_Staging]" description="La conexión de tiempo de ejecución OLE DB usada para obtener acceso a la base de datos." name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB]" errorOrTruncationOperation="Insertar" errorRowDisposition="FailComponent" hasSideEffects="true" name="Entrada de destino de OLE DB">
+                  <inputColumns>
+                    <inputColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[IDBoletoOrigen]" cachedName="IDBoletoOrigen" externalMetadataColumnId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDBoletoOrigen]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDBoletoOrigen]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[IDPartidoOrigen]" cachedName="IDPartidoOrigen" externalMetadataColumnId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDPartidoOrigen]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDPartidoOrigen]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[IDTipoEntradaOrigen]" cachedName="IDTipoEntradaOrigen" externalMetadataColumnId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDTipoEntradaOrigen]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDTipoEntradaOrigen]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[NombreTipoEntrada]" cachedName="NombreTipoEntrada" externalMetadataColumnId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NombreTipoEntrada]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreTipoEntrada]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[PrecioBase]" cachedName="PrecioBase" externalMetadataColumnId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[PrecioBase]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[PrecioBase]" cachedDataType="numeric" cachedPrecision="10" cachedScale="2" />
+                    <inputColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[FechaVenta]" cachedName="FechaVenta" externalMetadataColumnId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[FechaVenta]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FechaVenta]" cachedDataType="dbTimeStamp2" cachedScale="0" />
+                    <inputColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[CanalVenta]" cachedName="CanalVenta" externalMetadataColumnId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[CanalVenta]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[CanalVenta]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[MetodoPago]" cachedName="MetodoPago" externalMetadataColumnId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[MetodoPago]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[MetodoPago]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[EstadoPago]" cachedName="EstadoPago" externalMetadataColumnId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[EstadoPago]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[EstadoPago]" cachedDataType="str" cachedLength="50" cachedCodepage="1252" />
+                    <inputColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[PrecioPagado]" cachedName="PrecioPagado" externalMetadataColumnId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[PrecioPagado]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[PrecioPagado]" cachedDataType="numeric" cachedPrecision="10" cachedScale="2" />
+                  </inputColumns>
+                  <externalMetadataColumns isUsed="True">
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDBoletoOrigen]" name="IDBoletoOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDPartidoOrigen]" name="IDPartidoOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDTipoEntradaOrigen]" name="IDTipoEntradaOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[NombreTipoEntrada]" name="NombreTipoEntrada" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[PrecioBase]" name="PrecioBase" dataType="numeric" precision="10" scale="2" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[FechaVenta]" name="FechaVenta" dataType="dbTimeStamp2" scale="0" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[CanalVenta]" name="CanalVenta" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[MetodoPago]" name="MetodoPago" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[EstadoPago]" name="EstadoPago" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[PrecioPagado]" name="PrecioPagado" dataType="numeric" precision="10" scale="2" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output refId="Package\Extraer Boletos\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB]" exclusionGroup="1" isErrorOut="true" name="Salida de error de destino de OLE DB" synchronousInputId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB]">
+                  <outputColumns>
+                    <outputColumn refId="Package\Extraer Boletos\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorCode]" dataType="i4" lineageId="Package\Extraer Boletos\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorCode]" name="ErrorCode" specialFlags="1" />
+                    <outputColumn refId="Package\Extraer Boletos\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorColumn]" dataType="i4" lineageId="Package\Extraer Boletos\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorColumn]" name="ErrorColumn" specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component refId="Package\Extraer Boletos\Origen de OLE DB" componentClassID="Microsoft.OLEDBSource" contactInfo="Origen de OLE DB;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; Todos los derechos reservados; http://www.microsoft.com/sql/support;7" description="Origen de OLE DB" name="Origen de OLE DB" usesDispositions="true" version="7" validateExternalMetadata="false">
+              <properties>
+                <property dataType="System.Int32" description="Número de segundos antes de que se agote el tiempo de espera de un comando. Un valor de 0 indica un tiempo de espera infinito." name="CommandTimeout">0</property>
+                <property dataType="System.String" description="Especifica el nombre del objeto de base de datos usado para abrir un conjunto de filas." name="OpenRowset" />
+                <property dataType="System.String" description="Especifica la variable que contiene el nombre del objeto de base de datos usado para abrir un conjunto de filas." name="OpenRowsetVariable" />
+                <property dataType="System.String" description="Comando SQL para ejecutar." name="SqlCommand" UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT
+    b.IDboleto AS [IDBoletoOrigen],
+    b.IDpartido AS [IDPartidoOrigen],
+    t.IDtipoEntrada AS [IDTipoEntradaOrigen],
+    t.nombreTE AS [NombreTipoEntrada],
+    CAST(t.PrecioBase AS decimal(10,2)) AS [PrecioBase],
+    b.FechaVenta AS [FechaVenta],
+    b.CanalVenta AS [CanalVenta],
+    b.MetodoPago AS [MetodoPago],
+    b.EstadoPago AS [EstadoPago],
+    CAST(b.PrecioPagado AS decimal(10,2)) AS [PrecioPagado]
+FROM dbo.Boleto AS b
+JOIN dbo.TipoEntrada AS t ON t.IDtipoEntrada = b.IDtipoEntrada;</property>
+                <property dataType="System.String" description="Variable que contiene el comando SQL para ejecutar." name="SqlCommandVariable" />
+                <property dataType="System.Int32" description="Especifica la página de códigos de columna para utilizar cuando la información de página de códigos no está disponible en el origen de datos." name="DefaultCodePage">1252</property>
+                <property dataType="System.Boolean" description="Fuerza el uso del valor de la propiedad DefaultCodePage al describir datos de caracteres." name="AlwaysUseDefaultCodePage">false</property>
+                <property dataType="System.Int32" description="Especifica el modo utilizado para obtener acceso a la base de datos." name="AccessMode" typeConverter="AccessMode">2</property>
+                <property dataType="System.String" description="Asignaciones entre los parámetros del comando SQL y las variables." name="ParameterMapping" />
+              </properties>
+              <connections>
+                <connection refId="Package\Extraer Boletos\Origen de OLE DB.Connections[OleDbConnection]" connectionManagerID="{9872018A-2CA8-4F51-84C3-65ECEA8BA843}:external" connectionManagerRefId="Project.ConnectionManagers[CM_Origen]" description="La conexión de tiempo de ejecución OLE DB usada para obtener acceso a la base de datos." name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB]" name="Salida de origen de OLE DB">
+                  <outputColumns>
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDBoletoOrigen]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDBoletoOrigen]" name="IDBoletoOrigen" externalMetadataColumnId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDBoletoOrigen]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDPartidoOrigen]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDPartidoOrigen]" name="IDPartidoOrigen" externalMetadataColumnId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDPartidoOrigen]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDTipoEntradaOrigen]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDTipoEntradaOrigen]" name="IDTipoEntradaOrigen" externalMetadataColumnId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDTipoEntradaOrigen]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreTipoEntrada]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[NombreTipoEntrada]" name="NombreTipoEntrada" externalMetadataColumnId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NombreTipoEntrada]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[PrecioBase]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[PrecioBase]" name="PrecioBase" externalMetadataColumnId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[PrecioBase]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="numeric" precision="10" scale="2" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FechaVenta]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[FechaVenta]" name="FechaVenta" externalMetadataColumnId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[FechaVenta]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="dbTimeStamp2" scale="0" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[CanalVenta]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[CanalVenta]" name="CanalVenta" externalMetadataColumnId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[CanalVenta]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[MetodoPago]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[MetodoPago]" name="MetodoPago" externalMetadataColumnId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[MetodoPago]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[EstadoPago]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[EstadoPago]" name="EstadoPago" externalMetadataColumnId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[EstadoPago]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[PrecioPagado]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[PrecioPagado]" name="PrecioPagado" externalMetadataColumnId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[PrecioPagado]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="numeric" precision="10" scale="2" />
+                  </outputColumns>
+                  <externalMetadataColumns isUsed="True">
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDBoletoOrigen]" name="IDBoletoOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDPartidoOrigen]" name="IDPartidoOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDTipoEntradaOrigen]" name="IDTipoEntradaOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[NombreTipoEntrada]" name="NombreTipoEntrada" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[PrecioBase]" name="PrecioBase" dataType="numeric" precision="10" scale="2" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[FechaVenta]" name="FechaVenta" dataType="dbTimeStamp2" scale="0" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[CanalVenta]" name="CanalVenta" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[MetodoPago]" name="MetodoPago" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[EstadoPago]" name="EstadoPago" dataType="str" length="50" codePage="1252" />
+                    <externalMetadataColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[PrecioPagado]" name="PrecioPagado" dataType="numeric" precision="10" scale="2" />
+                  </externalMetadataColumns>
+                </output>
+                <output refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB]" isErrorOut="true" name="Salida de error de origen de OLE DB">
+                  <outputColumns>
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDBoletoOrigen]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDBoletoOrigen]" name="IDBoletoOrigen" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDPartidoOrigen]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDPartidoOrigen]" name="IDPartidoOrigen" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDTipoEntradaOrigen]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDTipoEntradaOrigen]" name="IDTipoEntradaOrigen" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NombreTipoEntrada]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[NombreTipoEntrada]" name="NombreTipoEntrada" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[PrecioBase]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[PrecioBase]" name="PrecioBase" dataType="numeric" precision="10" scale="2" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[FechaVenta]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[FechaVenta]" name="FechaVenta" dataType="dbTimeStamp2" scale="0" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[CanalVenta]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[CanalVenta]" name="CanalVenta" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[MetodoPago]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[MetodoPago]" name="MetodoPago" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[EstadoPago]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[EstadoPago]" name="EstadoPago" dataType="str" length="50" codePage="1252" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[PrecioPagado]" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[PrecioPagado]" name="PrecioPagado" dataType="numeric" precision="10" scale="2" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorCode]" dataType="i4" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorCode]" name="ErrorCode" specialFlags="1" />
+                    <outputColumn refId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorColumn]" dataType="i4" lineageId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorColumn]" name="ErrorColumn" specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path refId="Package\Extraer Boletos.Paths[Salida de origen de OLE DB]" endId="Package\Extraer Boletos\Destino de OLE DB.Inputs[Entrada de destino de OLE DB]" name="Salida de origen de OLE DB" startId="Package\Extraer Boletos\Origen de OLE DB.Outputs[Salida de origen de OLE DB]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Extraer Asistencia" DTS:CreationName="Microsoft.Pipeline" DTS:ExecutableType="Microsoft.Pipeline" DTS:DTSID="{40E08610-6E96-43DE-9F05-FE89106C03B7}" DTS:ObjectName="Extraer Asistencia" DTS:DelayValidation="True" DTS:LocaleID="-1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <pipeline version="1">
+          <components>
+            <component refId="Package\Extraer Asistencia\Destino de OLE DB" componentClassID="Microsoft.OLEDBDestination" contactInfo="Destino de OLE DB;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; Todos los derechos reservados; http://www.microsoft.com/sql/support;4" description="Destino de OLE DB" name="Destino de OLE DB" usesDispositions="true" version="4" validateExternalMetadata="false">
+              <properties>
+                <property dataType="System.Int32" description="Número de segundos antes de que se agote el tiempo de espera de un comando. Un valor de 0 indica un tiempo de espera infinito." name="CommandTimeout">0</property>
+                <property dataType="System.String" description="Especifica el nombre del objeto de base de datos usado para abrir un conjunto de filas." name="OpenRowset">[dbo].[stg_Asistencia]</property>
+                <property dataType="System.String" description="Especifica la variable que contiene el nombre del objeto de base de datos usado para abrir un conjunto de filas." name="OpenRowsetVariable" />
+                <property dataType="System.String" description="Comando SQL para ejecutar." name="SqlCommand" UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor" />
+                <property dataType="System.Int32" description="Especifica la página de códigos de columna para utilizar cuando la información de página de códigos no está disponible en el origen de datos." name="DefaultCodePage">1252</property>
+                <property dataType="System.Boolean" description="Fuerza el uso del valor de la propiedad DefaultCodePage al describir datos de caracteres." name="AlwaysUseDefaultCodePage">false</property>
+                <property dataType="System.Int32" description="Especifica el modo utilizado para obtener acceso a la base de datos." name="AccessMode" typeConverter="AccessMode">3</property>
+                <property dataType="System.Boolean" description="Indica si los valores proporcionados para columnas de identidad se van a copiar al destino. Si es False, los valores de las columnas de identidad se generan automáticamente en el destino. Solo se aplica si está activada la carga rápida." name="FastLoadKeepIdentity">false</property>
+                <property dataType="System.Boolean" description="Indica si las columnas que contienen NULL tendrán NULL insertado en el destino. Si es False, las columnas que contienen NULL tendrán sus valores predeterminados insertados en el destino. Solo se aplica si está activada la carga rápida." name="FastLoadKeepNulls">true</property>
+                <property dataType="System.String" description="Especifica opciones para usar con la carga rápida. Solo se aplica si está activada la carga rápida." name="FastLoadOptions">TABLOCK,CHECK_CONSTRAINTS</property>
+                <property dataType="System.Int32" description="Especifica cuándo se emiten confirmaciones durante la inserción de datos. El valor 0 especifica que se emitirá una confirmación al final de la inserción de datos. Solo se aplica si está activada la carga rápida." name="FastLoadMaxInsertCommitSize">0</property>
+              </properties>
+              <connections>
+                <connection refId="Package\Extraer Asistencia\Destino de OLE DB.Connections[OleDbConnection]" connectionManagerID="{AB120B29-1A2E-4C16-A2CC-3ABC748CD459}:external" connectionManagerRefId="Project.ConnectionManagers[CM_Staging]" description="La conexión de tiempo de ejecución OLE DB usada para obtener acceso a la base de datos." name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input refId="Package\Extraer Asistencia\Destino de OLE DB.Inputs[Entrada de destino de OLE DB]" errorOrTruncationOperation="Insertar" errorRowDisposition="FailComponent" hasSideEffects="true" name="Entrada de destino de OLE DB">
+                  <inputColumns>
+                    <inputColumn refId="Package\Extraer Asistencia\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[IDPartidoOrigen]" cachedName="IDPartidoOrigen" externalMetadataColumnId="Package\Extraer Asistencia\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDPartidoOrigen]" lineageId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDPartidoOrigen]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Asistencia\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[AsistenciaRegistrada]" cachedName="AsistenciaRegistrada" externalMetadataColumnId="Package\Extraer Asistencia\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[AsistenciaRegistrada]" lineageId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AsistenciaRegistrada]" cachedDataType="i4" />
+                    <inputColumn refId="Package\Extraer Asistencia\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].Columns[AforoEstadio]" cachedName="AforoEstadio" externalMetadataColumnId="Package\Extraer Asistencia\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[AforoEstadio]" lineageId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AforoEstadio]" cachedDataType="i4" />
+                  </inputColumns>
+                  <externalMetadataColumns isUsed="True">
+                    <externalMetadataColumn refId="Package\Extraer Asistencia\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[IDPartidoOrigen]" name="IDPartidoOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Asistencia\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[AsistenciaRegistrada]" name="AsistenciaRegistrada" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Asistencia\Destino de OLE DB.Inputs[Entrada de destino de OLE DB].ExternalColumns[AforoEstadio]" name="AforoEstadio" dataType="i4" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output refId="Package\Extraer Asistencia\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB]" exclusionGroup="1" isErrorOut="true" name="Salida de error de destino de OLE DB" synchronousInputId="Package\Extraer Asistencia\Destino de OLE DB.Inputs[Entrada de destino de OLE DB]">
+                  <outputColumns>
+                    <outputColumn refId="Package\Extraer Asistencia\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorCode]" dataType="i4" lineageId="Package\Extraer Asistencia\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorCode]" name="ErrorCode" specialFlags="1" />
+                    <outputColumn refId="Package\Extraer Asistencia\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorColumn]" dataType="i4" lineageId="Package\Extraer Asistencia\Destino de OLE DB.Outputs[Salida de error de destino de OLE DB].Columns[ErrorColumn]" name="ErrorColumn" specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component refId="Package\Extraer Asistencia\Origen de OLE DB" componentClassID="Microsoft.OLEDBSource" contactInfo="Origen de OLE DB;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; Todos los derechos reservados; http://www.microsoft.com/sql/support;7" description="Origen de OLE DB" name="Origen de OLE DB" usesDispositions="true" version="7" validateExternalMetadata="false">
+              <properties>
+                <property dataType="System.Int32" description="Número de segundos antes de que se agote el tiempo de espera de un comando. Un valor de 0 indica un tiempo de espera infinito." name="CommandTimeout">0</property>
+                <property dataType="System.String" description="Especifica el nombre del objeto de base de datos usado para abrir un conjunto de filas." name="OpenRowset" />
+                <property dataType="System.String" description="Especifica la variable que contiene el nombre del objeto de base de datos usado para abrir un conjunto de filas." name="OpenRowsetVariable" />
+                <property dataType="System.String" description="Comando SQL para ejecutar." name="SqlCommand" UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT
+    a.IDpartido AS [IDPartidoOrigen],
+    a.AsistenciaRegistrada AS [AsistenciaRegistrada],
+    a.AforoEstadio AS [AforoEstadio]
+FROM dbo.AsistenciaPartido AS a;</property>
+                <property dataType="System.String" description="Variable que contiene el comando SQL para ejecutar." name="SqlCommandVariable" />
+                <property dataType="System.Int32" description="Especifica la página de códigos de columna para utilizar cuando la información de página de códigos no está disponible en el origen de datos." name="DefaultCodePage">1252</property>
+                <property dataType="System.Boolean" description="Fuerza el uso del valor de la propiedad DefaultCodePage al describir datos de caracteres." name="AlwaysUseDefaultCodePage">false</property>
+                <property dataType="System.Int32" description="Especifica el modo utilizado para obtener acceso a la base de datos." name="AccessMode" typeConverter="AccessMode">2</property>
+                <property dataType="System.String" description="Asignaciones entre los parámetros del comando SQL y las variables." name="ParameterMapping" />
+              </properties>
+              <connections>
+                <connection refId="Package\Extraer Asistencia\Origen de OLE DB.Connections[OleDbConnection]" connectionManagerID="{9872018A-2CA8-4F51-84C3-65ECEA8BA843}:external" connectionManagerRefId="Project.ConnectionManagers[CM_Origen]" description="La conexión de tiempo de ejecución OLE DB usada para obtener acceso a la base de datos." name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output refId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB]" name="Salida de origen de OLE DB">
+                  <outputColumns>
+                    <outputColumn refId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDPartidoOrigen]" lineageId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[IDPartidoOrigen]" name="IDPartidoOrigen" externalMetadataColumnId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDPartidoOrigen]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AsistenciaRegistrada]" lineageId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AsistenciaRegistrada]" name="AsistenciaRegistrada" externalMetadataColumnId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[AsistenciaRegistrada]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AforoEstadio]" lineageId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].Columns[AforoEstadio]" name="AforoEstadio" externalMetadataColumnId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[AforoEstadio]" errorRowDisposition="FailComponent" truncationRowDisposition="FailComponent" dataType="i4" />
+                  </outputColumns>
+                  <externalMetadataColumns isUsed="True">
+                    <externalMetadataColumn refId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[IDPartidoOrigen]" name="IDPartidoOrigen" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[AsistenciaRegistrada]" name="AsistenciaRegistrada" dataType="i4" />
+                    <externalMetadataColumn refId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB].ExternalColumns[AforoEstadio]" name="AforoEstadio" dataType="i4" />
+                  </externalMetadataColumns>
+                </output>
+                <output refId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB]" isErrorOut="true" name="Salida de error de origen de OLE DB">
+                  <outputColumns>
+                    <outputColumn refId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDPartidoOrigen]" lineageId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[IDPartidoOrigen]" name="IDPartidoOrigen" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[AsistenciaRegistrada]" lineageId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[AsistenciaRegistrada]" name="AsistenciaRegistrada" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[AforoEstadio]" lineageId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[AforoEstadio]" name="AforoEstadio" dataType="i4" />
+                    <outputColumn refId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorCode]" dataType="i4" lineageId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorCode]" name="ErrorCode" specialFlags="1" />
+                    <outputColumn refId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorColumn]" dataType="i4" lineageId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de error de origen de OLE DB].Columns[ErrorColumn]" name="ErrorColumn" specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path refId="Package\Extraer Asistencia.Paths[Salida de origen de OLE DB]" endId="Package\Extraer Asistencia\Destino de OLE DB.Inputs[Entrada de destino de OLE DB]" name="Salida de origen de OLE DB" startId="Package\Extraer Asistencia\Origen de OLE DB.Outputs[Salida de origen de OLE DB]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Configurar sesión DW" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:DTSID="{40C12BF9-EEFE-479A-A535-A45E60F1ACDB}" DTS:ObjectName="Configurar sesión DW" DTS:DelayValidation="True" DTS:LocaleID="-1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData SQLTask:Connection="{A9894B2F-66FE-4BB2-8D12-38C29CE8F6AF}" SQLTask:BypassPrepare="True" SQLTask:SqlStatementSource="DECLARE @Catalogo nvarchar(128);&#10;SET @Catalogo = ?;&#10;EXEC sys.sp_set_session_context @key = N'ETL.BaseStaging', @value = @Catalogo;">
+          <SQLTask:ParameterBinding SQLTask:ParameterName="0" SQLTask:DtsVariableName="$Project::BaseStaging" SQLTask:ParameterDirection="Input" SQLTask:DataType="130" SQLTask:ParameterSize="128" />
+        </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Cargar DimTiempo" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:DTSID="{07D1FDB8-7848-483D-BBC4-286DC48196F7}" DTS:ObjectName="Cargar DimTiempo" DTS:DelayValidation="True" DTS:LocaleID="-1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData SQLTask:Connection="{A9894B2F-66FE-4BB2-8D12-38C29CE8F6AF}" SQLTask:BypassPrepare="True" SQLTask:SqlStatementSource="DECLARE @Catalogo nvarchar(4000);&#10;SET @Catalogo = CONVERT(nvarchar(4000), SESSION_CONTEXT(N'ETL.BaseStaging'));&#10;SET NOCOUNT ON;&#10;SET XACT_ABORT ON;&#10;BEGIN TRY&#10;    IF @Catalogo IS NULL OR LEN(@Catalogo) = 0 OR LEN(@Catalogo) &gt; 128&#10;        THROW 51004, 'Configure BaseStaging con un nombre de base válido.', 1;&#10;    IF DB_ID(@Catalogo) IS NULL OR DB_ID(@Catalogo) = DB_ID()&#10;        THROW 51005, 'BaseStaging debe identificar otra base accesible en la instancia del DW.', 1;&#10;    IF OBJECT_ID(N'dbo.FactVentas', N'U') IS NULL&#10;        OR OBJECT_ID(N'dbo.FactAsistencia', N'U') IS NULL&#10;        THROW 51008, 'El DW debe tener dbo.FactVentas y dbo.FactAsistencia. Revise BaseDW y el script DW_ligasdeAscenso_new.sql.', 1;&#10;    IF @@TRANCOUNT &lt;&gt; 0&#10;        THROW 51007, 'CM_DWNEW ya tiene una transacción activa.', 1;&#10;    BEGIN TRANSACTION;&#10;    DECLARE @Sql nvarchar(max) = CONVERT(nvarchar(max), N'')&#10;        + N'SET LANGUAGE Spanish;&#10;SET DATEFIRST 1;&#10;DECLARE @LockResult int;&#10;    EXEC @LockResult = sys.sp_getapplock&#10;        @Resource = N''ETL_LigasAscenso.DW'', @LockMode = ''Exclusive'',&#10;        @LockOwner = ''Transaction'', @LockTimeout = 60000;&#10;    IF @LockResult &lt; 0 THROW 51001, ''No se consiguió el bloqueo del DW.'', 1;&#10;&#10;    IF EXISTS (SELECT 1 FROM @CATALOGO@.dbo.stg_Boletos AS b&#10;               WHERE NOT EXISTS (SELECT 1 FROM @CATALOGO@.dbo.stg_Partidos AS p WHERE p.IDPartidoOrigen = b.IDPartidoOrigen))&#10;       OR EXISTS (SELECT 1 FROM @CATALOGO@.dbo.stg_Asistencia AS a&#10;                  WHERE NOT EXISTS (SELECT 1 FROM @CATALOGO@.dbo.stg_Partidos AS p WHERE p.IDPartidoOrigen = a.IDPartidoOrigen))&#10;        THROW 51002, ''Staging contiene boletos o asistencia sin partido. Reintente con el origen estable.'', 1;&#10;&#10;SELECT DISTINCT IDTiempo, Fecha, Anio, Mes, NombreMes, Dia, DiaSemana, NombreDiaSemana, EsFinDeSemana&#10;INTO #DimTiempo&#10;FROM (&#10;    SELECT CONVERT(int, CONVERT(char(8), f.Fecha, 112)), f.Fecha,&#10;           YEAR(f.Fecha), MONTH(f.Fecha), DATENAME(month, f.Fecha),&#10;           DAY(f.Fecha), DATEPART(weekday, f.Fecha), DATENAME(weekday, f.Fecha),&#10;           CONVERT(bit, CASE WHEN DATEPART(weekday, f.Fecha) IN (6, 7) THEN 1 ELSE 0 END)&#10;    FROM @CATALOGO@.dbo.stg_Partidos AS p&#10;    CROSS APPLY (VALUES (CONVERT(date, p.FechaHoraPartido))) AS f (Fecha)&#10;) AS d (IDTiempo, Fecha, Anio, Mes, NombreMes, Dia, DiaSemana, NombreDiaSemana, EsFinDeSemana);&#10;CREATE UNIQUE CLUSTERED INDEX IX_DimTiempo ON #DimTiempo (IDTiempo);&#10;&#10;UPDATE dst SET&#10;    Fecha = src.Fecha,&#10;    Anio = src.Anio,&#10;    Mes = src.Mes,&#10;    N'&#10;        + N'ombreMes = src.NombreMes,&#10;    Dia = src.Dia,&#10;    DiaSemana = src.DiaSemana,&#10;    NombreDiaSemana = src.NombreDiaSemana,&#10;    EsFinDeSemana = src.EsFinDeSemana&#10;FROM dbo.DimTiempo AS dst&#10;JOIN #DimTiempo AS src ON src.IDTiempo = dst.IDTiempo&#10;WHERE EXISTS (&#10;    SELECT src.Fecha, src.Anio, src.Mes, src.NombreMes, src.Dia, src.DiaSemana, src.NombreDiaSemana, src.EsFinDeSemana&#10;    EXCEPT&#10;    SELECT dst.Fecha, dst.Anio, dst.Mes, dst.NombreMes, dst.Dia, dst.DiaSemana, dst.NombreDiaSemana, dst.EsFinDeSemana&#10;);&#10;&#10;INSERT INTO dbo.DimTiempo (IDTiempo, Fecha, Anio, Mes, NombreMes, Dia, DiaSemana, NombreDiaSemana, EsFinDeSemana)&#10;SELECT IDTiempo, Fecha, Anio, Mes, NombreMes, Dia, DiaSemana, NombreDiaSemana, EsFinDeSemana FROM #DimTiempo AS src&#10;WHERE NOT EXISTS (SELECT 1 FROM dbo.DimTiempo AS dst WHERE dst.IDTiempo = src.IDTiempo);&#10;';&#10;    SET @Sql = REPLACE(@Sql, N'@CATALOGO@', QUOTENAME(@Catalogo));&#10;    EXEC sys.sp_executesql @Sql;&#10;END TRY&#10;BEGIN CATCH&#10;    IF XACT_STATE() &lt;&gt; 0 ROLLBACK TRANSACTION;&#10;    THROW;&#10;END CATCH;&#10;">
+          </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Cargar DimTemporada" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:DTSID="{4AD1A131-B632-447D-93A7-3AAE6096EA35}" DTS:ObjectName="Cargar DimTemporada" DTS:DelayValidation="True" DTS:LocaleID="-1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData SQLTask:Connection="{A9894B2F-66FE-4BB2-8D12-38C29CE8F6AF}" SQLTask:BypassPrepare="True" SQLTask:SqlStatementSource="DECLARE @Catalogo nvarchar(4000);&#10;SET @Catalogo = CONVERT(nvarchar(4000), SESSION_CONTEXT(N'ETL.BaseStaging'));&#10;SET NOCOUNT ON;&#10;SET XACT_ABORT ON;&#10;BEGIN TRY&#10;    IF @Catalogo IS NULL OR LEN(@Catalogo) = 0 OR LEN(@Catalogo) &gt; 128&#10;        THROW 51004, 'Configure BaseStaging con un nombre de base válido.', 1;&#10;    IF DB_ID(@Catalogo) IS NULL OR DB_ID(@Catalogo) = DB_ID()&#10;        THROW 51005, 'BaseStaging debe identificar otra base accesible en la instancia del DW.', 1;&#10;    IF XACT_STATE() &lt;&gt; 1 OR @@TRANCOUNT &lt;&gt; 1&#10;        THROW 51006, 'No hay una transacción activa del ETL en CM_DWNEW.', 1;&#10;    DECLARE @Sql nvarchar(max) = CONVERT(nvarchar(max), N'')&#10;        + N'SELECT DISTINCT IDTemporada, Anio, FechaInicio, FechaFinal&#10;INTO #DimTemporada&#10;FROM (&#10;    SELECT IDTemporadaOrigen, AnioTemporada, FechaInicioTemporada, FechaFinTemporada&#10;    FROM @CATALOGO@.dbo.stg_Partidos&#10;) AS d (IDTemporada, Anio, FechaInicio, FechaFinal);&#10;CREATE UNIQUE CLUSTERED INDEX IX_DimTemporada ON #DimTemporada (IDTemporada);&#10;&#10;UPDATE dst SET&#10;    Anio = src.Anio,&#10;    FechaInicio = src.FechaInicio,&#10;    FechaFinal = src.FechaFinal&#10;FROM dbo.DimTemporada AS dst&#10;JOIN #DimTemporada AS src ON src.IDTemporada = dst.IDTemporada&#10;WHERE EXISTS (&#10;    SELECT src.Anio, src.FechaInicio, src.FechaFinal&#10;    EXCEPT&#10;    SELECT dst.Anio, dst.FechaInicio, dst.FechaFinal&#10;);&#10;&#10;INSERT INTO dbo.DimTemporada (IDTemporada, Anio, FechaInicio, FechaFinal)&#10;SELECT IDTemporada, Anio, FechaInicio, FechaFinal FROM #DimTemporada AS src&#10;WHERE NOT EXISTS (SELECT 1 FROM dbo.DimTemporada AS dst WHERE dst.IDTemporada = src.IDTemporada);&#10;';&#10;    SET @Sql = REPLACE(@Sql, N'@CATALOGO@', QUOTENAME(@Catalogo));&#10;    EXEC sys.sp_executesql @Sql;&#10;END TRY&#10;BEGIN CATCH&#10;    IF XACT_STATE() &lt;&gt; 0 ROLLBACK TRANSACTION;&#10;    THROW;&#10;END CATCH;&#10;">
+          </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Cargar DimEstadio" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:DTSID="{A6EA9002-DDE2-4839-A19D-E91E24151BD4}" DTS:ObjectName="Cargar DimEstadio" DTS:DelayValidation="True" DTS:LocaleID="-1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData SQLTask:Connection="{A9894B2F-66FE-4BB2-8D12-38C29CE8F6AF}" SQLTask:BypassPrepare="True" SQLTask:SqlStatementSource="DECLARE @Catalogo nvarchar(4000);&#10;SET @Catalogo = CONVERT(nvarchar(4000), SESSION_CONTEXT(N'ETL.BaseStaging'));&#10;SET NOCOUNT ON;&#10;SET XACT_ABORT ON;&#10;BEGIN TRY&#10;    IF @Catalogo IS NULL OR LEN(@Catalogo) = 0 OR LEN(@Catalogo) &gt; 128&#10;        THROW 51004, 'Configure BaseStaging con un nombre de base válido.', 1;&#10;    IF DB_ID(@Catalogo) IS NULL OR DB_ID(@Catalogo) = DB_ID()&#10;        THROW 51005, 'BaseStaging debe identificar otra base accesible en la instancia del DW.', 1;&#10;    IF XACT_STATE() &lt;&gt; 1 OR @@TRANCOUNT &lt;&gt; 1&#10;        THROW 51006, 'No hay una transacción activa del ETL en CM_DWNEW.', 1;&#10;    DECLARE @Sql nvarchar(max) = CONVERT(nvarchar(max), N'')&#10;        + N'SELECT DISTINCT IDEstadio, NombreEstadio, Departamento, Provincia, Distrito, Region, Categoria, MaxAforo&#10;INTO #DimEstadio&#10;FROM (&#10;    SELECT IDEstadioOrigen, NombreEstadio, DepartamentoEstadio, ProvinciaEstadio,&#10;           DistritoEstadio, RegionEstadio, CategoriaEstadio, MaxAforo&#10;    FROM @CATALOGO@.dbo.stg_Partidos&#10;) AS d (IDEstadio, NombreEstadio, Departamento, Provincia, Distrito, Region, Categoria, MaxAforo);&#10;CREATE UNIQUE CLUSTERED INDEX IX_DimEstadio ON #DimEstadio (IDEstadio);&#10;&#10;UPDATE dst SET&#10;    NombreEstadio = src.NombreEstadio,&#10;    Departamento = src.Departamento,&#10;    Provincia = src.Provincia,&#10;    Distrito = src.Distrito,&#10;    Region = src.Region,&#10;    Categoria = src.Categoria,&#10;    MaxAforo = src.MaxAforo&#10;FROM dbo.DimEstadio AS dst&#10;JOIN #DimEstadio AS src ON src.IDEstadio = dst.IDEstadio&#10;WHERE EXISTS (&#10;    SELECT src.NombreEstadio, src.Departamento, src.Provincia, src.Distrito, src.Region, src.Categoria, src.MaxAforo&#10;    EXCEPT&#10;    SELECT dst.NombreEstadio, dst.Departamento, dst.Provincia, dst.Distrito, dst.Region, dst.Categoria, dst.MaxAforo&#10;);&#10;&#10;INSERT INTO dbo.DimEstadio (IDEstadio, NombreEstadio, Departamento, Provincia, Distrito, Region, Categoria, MaxAforo)&#10;SELECT IDEstadio, NombreEstadio, Departamento, Provincia, Distrito, Region, Categoria, MaxAforo FROM #DimEstadio AS src&#10;WHERE NOT EXISTS (SELECT 1 FROM dbo.DimEstadio AS dst WHERE dst.IDEstadio = src.IDEstadio);&#10;';&#10;    SET @Sql = REPLACE(@Sql, N'@CATALOGO@', QUOTENAME(@Catalogo));&#10;    EXEC sys.sp_executesql @Sql;&#10;END TRY&#10;BEGIN CATCH&#10;    IF XACT_STATE() &lt;&gt; 0 ROLLBACK TRANSACTION;&#10;    THROW;&#10;END CATCH;&#10;">
+          </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Cargar DimCompeticion" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:DTSID="{EF96B116-84EB-454C-8FD0-4E817E495D79}" DTS:ObjectName="Cargar DimCompeticion" DTS:DelayValidation="True" DTS:LocaleID="-1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData SQLTask:Connection="{A9894B2F-66FE-4BB2-8D12-38C29CE8F6AF}" SQLTask:BypassPrepare="True" SQLTask:SqlStatementSource="DECLARE @Catalogo nvarchar(4000);&#10;SET @Catalogo = CONVERT(nvarchar(4000), SESSION_CONTEXT(N'ETL.BaseStaging'));&#10;SET NOCOUNT ON;&#10;SET XACT_ABORT ON;&#10;BEGIN TRY&#10;    IF @Catalogo IS NULL OR LEN(@Catalogo) = 0 OR LEN(@Catalogo) &gt; 128&#10;        THROW 51004, 'Configure BaseStaging con un nombre de base válido.', 1;&#10;    IF DB_ID(@Catalogo) IS NULL OR DB_ID(@Catalogo) = DB_ID()&#10;        THROW 51005, 'BaseStaging debe identificar otra base accesible en la instancia del DW.', 1;&#10;    IF XACT_STATE() &lt;&gt; 1 OR @@TRANCOUNT &lt;&gt; 1&#10;        THROW 51006, 'No hay una transacción activa del ETL en CM_DWNEW.', 1;&#10;    DECLARE @Sql nvarchar(max) = CONVERT(nvarchar(max), N'')&#10;        + N'SELECT DISTINCT IDEtapa, IDCompeticionOrigen, NombreCompeticion, Organizador, NivelCompeticion, NombreEtapa, NivelEtapa, FactorPrecio&#10;INTO #DimCompeticion&#10;FROM (&#10;    SELECT IDEtapaOrigen, IDCompeticionOrigen, NombreCompeticion, Organizador,&#10;           NivelCompeticion, NombreEtapa, NivelEtapa, FactorPrecio&#10;    FROM @CATALOGO@.dbo.stg_Partidos&#10;) AS d (IDEtapa, IDCompeticionOrigen, NombreCompeticion, Organizador, NivelCompeticion, NombreEtapa, NivelEtapa, FactorPrecio);&#10;CREATE UNIQUE CLUSTERED INDEX IX_DimCompeticion ON #DimCompeticion (IDEtapa);&#10;&#10;UPDATE dst SET&#10;    IDCompeticionOrigen = src.IDCompeticionOrigen,&#10;    NombreCompeticion = src.NombreCompeticion,&#10;    Organizador = src.Organizador,&#10;    NivelCompeticion = src.NivelCompeticion,&#10;    NombreEtapa = src.NombreEtapa,&#10;    NivelEtapa = src.NivelEtapa,&#10;    FactorPrecio = src.FactorPrecio&#10;FROM dbo.DimCompeticion AS dst&#10;JOIN #DimCompeticion AS src ON src.IDEtapa = dst.IDEtapa&#10;WHERE EXISTS (&#10;    SELECT src.IDCompeticionOrigen, src.NombreCompeticion, src.Organizador, src.NivelCompeticion, src.NombreEtapa, src.NivelEtapa, src.FactorPrecio&#10;    EXCEPT&#10;    SELECT dst.IDCompeticionOrigen, dst.NombreCompeticion, dst.Organizador, dst.NivelCompeticion, dst.NombreEtapa, dst.NivelEtapa, dst.FactorPrecio&#10;);&#10;&#10;INSERT INTO dbo.DimCompeticion (IDEtapa, IDCompeticionOrigen, NombreCompeticion, Organizador, NivelCompeticion, NombreEtapa, NivelEtapa, FactorPrecio)&#10;SELECT IDEtapa, IDCompeticionOrigen, NombreCompeticion, Organizador, NivelCompeticion, NombreEtapa, NivelEtapa, FactorPrecio FROM #DimCompeticion AS src&#10;WHERE NOT EXISTS (SELECT 1 FROM d'&#10;        + N'bo.DimCompeticion AS dst WHERE dst.IDEtapa = src.IDEtapa);&#10;';&#10;    SET @Sql = REPLACE(@Sql, N'@CATALOGO@', QUOTENAME(@Catalogo));&#10;    EXEC sys.sp_executesql @Sql;&#10;END TRY&#10;BEGIN CATCH&#10;    IF XACT_STATE() &lt;&gt; 0 ROLLBACK TRANSACTION;&#10;    THROW;&#10;END CATCH;&#10;">
+          </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Cargar DimTipoEntrada" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:DTSID="{128B0F98-6B9B-4476-BD4D-570CD4106F69}" DTS:ObjectName="Cargar DimTipoEntrada" DTS:DelayValidation="True" DTS:LocaleID="-1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData SQLTask:Connection="{A9894B2F-66FE-4BB2-8D12-38C29CE8F6AF}" SQLTask:BypassPrepare="True" SQLTask:SqlStatementSource="DECLARE @Catalogo nvarchar(4000);&#10;SET @Catalogo = CONVERT(nvarchar(4000), SESSION_CONTEXT(N'ETL.BaseStaging'));&#10;SET NOCOUNT ON;&#10;SET XACT_ABORT ON;&#10;BEGIN TRY&#10;    IF @Catalogo IS NULL OR LEN(@Catalogo) = 0 OR LEN(@Catalogo) &gt; 128&#10;        THROW 51004, 'Configure BaseStaging con un nombre de base válido.', 1;&#10;    IF DB_ID(@Catalogo) IS NULL OR DB_ID(@Catalogo) = DB_ID()&#10;        THROW 51005, 'BaseStaging debe identificar otra base accesible en la instancia del DW.', 1;&#10;    IF XACT_STATE() &lt;&gt; 1 OR @@TRANCOUNT &lt;&gt; 1&#10;        THROW 51006, 'No hay una transacción activa del ETL en CM_DWNEW.', 1;&#10;    DECLARE @Sql nvarchar(max) = CONVERT(nvarchar(max), N'')&#10;        + N'SELECT DISTINCT IDTipoEntrada, NombreTE, PrecioBase&#10;INTO #DimTipoEntrada&#10;FROM (&#10;    SELECT IDTipoEntradaOrigen, NombreTipoEntrada, PrecioBase FROM @CATALOGO@.dbo.stg_Boletos&#10;) AS d (IDTipoEntrada, NombreTE, PrecioBase);&#10;CREATE UNIQUE CLUSTERED INDEX IX_DimTipoEntrada ON #DimTipoEntrada (IDTipoEntrada);&#10;&#10;UPDATE dst SET&#10;    NombreTE = src.NombreTE,&#10;    PrecioBase = src.PrecioBase&#10;FROM dbo.DimTipoEntrada AS dst&#10;JOIN #DimTipoEntrada AS src ON src.IDTipoEntrada = dst.IDTipoEntrada&#10;WHERE EXISTS (&#10;    SELECT src.NombreTE, src.PrecioBase&#10;    EXCEPT&#10;    SELECT dst.NombreTE, dst.PrecioBase&#10;);&#10;&#10;INSERT INTO dbo.DimTipoEntrada (IDTipoEntrada, NombreTE, PrecioBase)&#10;SELECT IDTipoEntrada, NombreTE, PrecioBase FROM #DimTipoEntrada AS src&#10;WHERE NOT EXISTS (SELECT 1 FROM dbo.DimTipoEntrada AS dst WHERE dst.IDTipoEntrada = src.IDTipoEntrada);&#10;';&#10;    SET @Sql = REPLACE(@Sql, N'@CATALOGO@', QUOTENAME(@Catalogo));&#10;    EXEC sys.sp_executesql @Sql;&#10;END TRY&#10;BEGIN CATCH&#10;    IF XACT_STATE() &lt;&gt; 0 ROLLBACK TRANSACTION;&#10;    THROW;&#10;END CATCH;&#10;">
+          </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Cargar DimClub" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:DTSID="{574AB000-63EE-494A-9A9F-E17693061B19}" DTS:ObjectName="Cargar DimClub" DTS:DelayValidation="True" DTS:LocaleID="-1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData SQLTask:Connection="{A9894B2F-66FE-4BB2-8D12-38C29CE8F6AF}" SQLTask:BypassPrepare="True" SQLTask:SqlStatementSource="DECLARE @Catalogo nvarchar(4000);&#10;SET @Catalogo = CONVERT(nvarchar(4000), SESSION_CONTEXT(N'ETL.BaseStaging'));&#10;SET NOCOUNT ON;&#10;SET XACT_ABORT ON;&#10;BEGIN TRY&#10;    IF @Catalogo IS NULL OR LEN(@Catalogo) = 0 OR LEN(@Catalogo) &gt; 128&#10;        THROW 51004, 'Configure BaseStaging con un nombre de base válido.', 1;&#10;    IF DB_ID(@Catalogo) IS NULL OR DB_ID(@Catalogo) = DB_ID()&#10;        THROW 51005, 'BaseStaging debe identificar otra base accesible en la instancia del DW.', 1;&#10;    IF XACT_STATE() &lt;&gt; 1 OR @@TRANCOUNT &lt;&gt; 1&#10;        THROW 51006, 'No hay una transacción activa del ETL en CM_DWNEW.', 1;&#10;    DECLARE @Sql nvarchar(max) = CONVERT(nvarchar(max), N'')&#10;        + N'SELECT DISTINCT IDClub, NombreClub, Departamento, Provincia, AnioFundacion&#10;INTO #DimClub&#10;FROM (&#10;    SELECT IDClubLocalOrigen, NombreClubLocal, DepartamentoClubLocal, ProvinciaClubLocal, AnioFundacionLocal FROM @CATALOGO@.dbo.stg_Partidos&#10;    UNION ALL&#10;    SELECT IDClubVisitaOrigen, NombreClubVisita, DepartamentoClubVisita, ProvinciaClubVisita, AnioFundacionVisita FROM @CATALOGO@.dbo.stg_Partidos&#10;) AS d (IDClub, NombreClub, Departamento, Provincia, AnioFundacion);&#10;CREATE UNIQUE CLUSTERED INDEX IX_DimClub ON #DimClub (IDClub);&#10;&#10;UPDATE dst SET&#10;    NombreClub = src.NombreClub,&#10;    Departamento = src.Departamento,&#10;    Provincia = src.Provincia,&#10;    AnioFundacion = src.AnioFundacion&#10;FROM dbo.DimClub AS dst&#10;JOIN #DimClub AS src ON src.IDClub = dst.IDClub&#10;WHERE EXISTS (&#10;    SELECT src.NombreClub, src.Departamento, src.Provincia, src.AnioFundacion&#10;    EXCEPT&#10;    SELECT dst.NombreClub, dst.Departamento, dst.Provincia, dst.AnioFundacion&#10;);&#10;&#10;INSERT INTO dbo.DimClub (IDClub, NombreClub, Departamento, Provincia, AnioFundacion)&#10;SELECT IDClub, NombreClub, Departamento, Provincia, AnioFundacion FROM #DimClub AS src&#10;WHERE NOT EXISTS (SELECT 1 FROM dbo.DimClub AS dst WHERE dst.IDClub = src.IDClub);&#10;';&#10;    SET @Sql = REPLACE(@Sql, N'@CATALOGO@', QUOTENAME(@Catalogo));&#10;    EXEC sys.sp_executesql @Sql;&#10;END TRY&#10;BEGIN CATCH&#10;    IF XACT_STATE() &lt;&gt; 0 ROLLBACK TRANSACTION;&#10;    THROW;&#10;END CATCH;&#10;">
+          </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Cargar FactVentas" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:DTSID="{649EBDFF-D7E2-477A-9E85-0A375452DE66}" DTS:ObjectName="Cargar FactVentas" DTS:DelayValidation="True" DTS:LocaleID="-1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData SQLTask:Connection="{A9894B2F-66FE-4BB2-8D12-38C29CE8F6AF}" SQLTask:BypassPrepare="True" SQLTask:SqlStatementSource="DECLARE @Catalogo nvarchar(4000);&#10;SET @Catalogo = CONVERT(nvarchar(4000), SESSION_CONTEXT(N'ETL.BaseStaging'));&#10;SET NOCOUNT ON;&#10;SET XACT_ABORT ON;&#10;BEGIN TRY&#10;    IF @Catalogo IS NULL OR LEN(@Catalogo) = 0 OR LEN(@Catalogo) &gt; 128&#10;        THROW 51004, 'Configure BaseStaging con un nombre de base válido.', 1;&#10;    IF DB_ID(@Catalogo) IS NULL OR DB_ID(@Catalogo) = DB_ID()&#10;        THROW 51005, 'BaseStaging debe identificar otra base accesible en la instancia del DW.', 1;&#10;    IF XACT_STATE() &lt;&gt; 1 OR @@TRANCOUNT &lt;&gt; 1&#10;        THROW 51006, 'No hay una transacción activa del ETL en CM_DWNEW.', 1;&#10;    DECLARE @Sql nvarchar(max) = CONVERT(nvarchar(max), N'')&#10;        + N'DELETE f&#10;FROM dbo.FactVentas AS f&#10;JOIN @CATALOGO@.dbo.stg_Partidos AS p ON p.IDPartidoOrigen = f.IDPartido;&#10;&#10;;WITH Ventas AS (&#10;    SELECT IDPartidoOrigen, IDTipoEntradaOrigen, COUNT(*) AS BoletosVendidos,&#10;           SUM(COALESCE(PrecioPagado, CONVERT(decimal(10,2), 0))) AS IngresosTaquilla&#10;    FROM @CATALOGO@.dbo.stg_Boletos&#10;    WHERE EstadoPago = ''Pagado''&#10;    GROUP BY IDPartidoOrigen, IDTipoEntradaOrigen&#10;)&#10;INSERT INTO dbo.FactVentas (&#10;    IDPartido, IDTipoEntrada, IDTiempoPartido, IDTemporada, IDEstadio, IDEtapa,&#10;    IDClubLocal, IDClubVisita, BoletosVendidos, IngresosTaquilla&#10;)&#10;SELECT p.IDPartidoOrigen, v.IDTipoEntradaOrigen, CONVERT(int, CONVERT(char(8), p.FechaHoraPartido, 112)),&#10;       p.IDTemporadaOrigen, p.IDEstadioOrigen, p.IDEtapaOrigen, p.IDClubLocalOrigen,&#10;       p.IDClubVisitaOrigen, v.BoletosVendidos, v.IngresosTaquilla&#10;FROM Ventas AS v&#10;JOIN @CATALOGO@.dbo.stg_Partidos AS p ON p.IDPartidoOrigen = v.IDPartidoOrigen;&#10;';&#10;    SET @Sql = REPLACE(@Sql, N'@CATALOGO@', QUOTENAME(@Catalogo));&#10;    EXEC sys.sp_executesql @Sql;&#10;END TRY&#10;BEGIN CATCH&#10;    IF XACT_STATE() &lt;&gt; 0 ROLLBACK TRANSACTION;&#10;    THROW;&#10;END CATCH;&#10;">
+          </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Cargar FactAsistencia" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:DTSID="{F5AF8722-00E7-444E-A88D-087B4BC9C277}" DTS:ObjectName="Cargar FactAsistencia" DTS:DelayValidation="True" DTS:LocaleID="-1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData SQLTask:Connection="{A9894B2F-66FE-4BB2-8D12-38C29CE8F6AF}" SQLTask:BypassPrepare="True" SQLTask:SqlStatementSource="DECLARE @Catalogo nvarchar(4000);&#10;SET @Catalogo = CONVERT(nvarchar(4000), SESSION_CONTEXT(N'ETL.BaseStaging'));&#10;SET NOCOUNT ON;&#10;SET XACT_ABORT ON;&#10;BEGIN TRY&#10;    IF @Catalogo IS NULL OR LEN(@Catalogo) = 0 OR LEN(@Catalogo) &gt; 128&#10;        THROW 51004, 'Configure BaseStaging con un nombre de base válido.', 1;&#10;    IF DB_ID(@Catalogo) IS NULL OR DB_ID(@Catalogo) = DB_ID()&#10;        THROW 51005, 'BaseStaging debe identificar otra base accesible en la instancia del DW.', 1;&#10;    IF XACT_STATE() &lt;&gt; 1 OR @@TRANCOUNT &lt;&gt; 1&#10;        THROW 51006, 'No hay una transacción activa del ETL en CM_DWNEW.', 1;&#10;    DECLARE @Sql nvarchar(max) = CONVERT(nvarchar(max), N'')&#10;        + N'DELETE f&#10;FROM dbo.FactAsistencia AS f&#10;JOIN @CATALOGO@.dbo.stg_Partidos AS p ON p.IDPartidoOrigen = f.IDPartido;&#10;&#10;INSERT INTO dbo.FactAsistencia (&#10;    IDPartido, IDTiempoPartido, IDTemporada, IDEstadio, IDEtapa,&#10;    IDClubLocal, IDClubVisita, EstadoPartido, AsistenciaRegistrada, AforoEstadio&#10;)&#10;SELECT p.IDPartidoOrigen, CONVERT(int, CONVERT(char(8), p.FechaHoraPartido, 112)),&#10;       p.IDTemporadaOrigen, p.IDEstadioOrigen, p.IDEtapaOrigen, p.IDClubLocalOrigen,&#10;       p.IDClubVisitaOrigen, p.EstadoPartido, a.AsistenciaRegistrada, a.AforoEstadio&#10;FROM @CATALOGO@.dbo.stg_Partidos AS p&#10;LEFT JOIN @CATALOGO@.dbo.stg_Asistencia AS a ON a.IDPartidoOrigen = p.IDPartidoOrigen;&#10;';&#10;    SET @Sql = REPLACE(@Sql, N'@CATALOGO@', QUOTENAME(@Catalogo));&#10;    EXEC sys.sp_executesql @Sql;&#10;    COMMIT TRANSACTION;&#10;END TRY&#10;BEGIN CATCH&#10;    IF XACT_STATE() &lt;&gt; 0 ROLLBACK TRANSACTION;&#10;    THROW;&#10;END CATCH;&#10;">
+          </SQLTask:SqlTaskData>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Liberar staging" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:DTSID="{1415B17C-6308-4120-983A-03DB4BBF8B9E}" DTS:ObjectName="Liberar staging" DTS:DelayValidation="True" DTS:LocaleID="-1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData SQLTask:Connection="{AB120B29-1A2E-4C16-A2CC-3ABC748CD459}" SQLTask:BypassPrepare="True" SQLTask:SqlStatementSource="EXEC sys.sp_releaseapplock&#10;    @Resource = N'ETL_LigasAscenso.Staging', @LockOwner = 'Session';" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Secuencia 1]" DTS:CreationName="" DTS:DTSID="{2D3B7DD6-9237-4920-B673-391FD25A3BBE}" DTS:From="Package\Preparar staging" DTS:To="Package\Extraer Partidos" DTS:LogicalAnd="True" DTS:ObjectName="Secuencia 1" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Secuencia 2]" DTS:CreationName="" DTS:DTSID="{51819680-9637-47F3-B231-2CA6A98D0B7F}" DTS:From="Package\Extraer Partidos" DTS:To="Package\Extraer Boletos" DTS:LogicalAnd="True" DTS:ObjectName="Secuencia 2" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Secuencia 3]" DTS:CreationName="" DTS:DTSID="{F359EA24-31C6-44B3-B78E-BF2626081328}" DTS:From="Package\Extraer Boletos" DTS:To="Package\Extraer Asistencia" DTS:LogicalAnd="True" DTS:ObjectName="Secuencia 3" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Carga DW 4]" DTS:CreationName="" DTS:DTSID="{FFB6A8F3-F478-43C9-A343-B53811C4A7B0}" DTS:From="Package\Extraer Asistencia" DTS:To="Package\Configurar sesión DW" DTS:LogicalAnd="True" DTS:ObjectName="Carga DW 4" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Carga DW 5]" DTS:CreationName="" DTS:DTSID="{A107501E-1B84-457D-826B-3603F603CE36}" DTS:From="Package\Cargar DimTiempo" DTS:To="Package\Cargar DimTemporada" DTS:LogicalAnd="True" DTS:ObjectName="Carga DW 5" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Carga DW 6]" DTS:CreationName="" DTS:DTSID="{8ACACF41-44BB-48BD-B603-695A5F130145}" DTS:From="Package\Cargar DimTemporada" DTS:To="Package\Cargar DimEstadio" DTS:LogicalAnd="True" DTS:ObjectName="Carga DW 6" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Carga DW 7]" DTS:CreationName="" DTS:DTSID="{DAABF87D-8E5F-4A20-8E23-1FF4C6F5EFFF}" DTS:From="Package\Cargar DimEstadio" DTS:To="Package\Cargar DimCompeticion" DTS:LogicalAnd="True" DTS:ObjectName="Carga DW 7" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Carga DW 8]" DTS:CreationName="" DTS:DTSID="{442D60BE-2516-4B47-803F-34160E14DAC1}" DTS:From="Package\Cargar DimCompeticion" DTS:To="Package\Cargar DimTipoEntrada" DTS:LogicalAnd="True" DTS:ObjectName="Carga DW 8" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Carga DW 9]" DTS:CreationName="" DTS:DTSID="{62F0BAE5-C662-42B5-B037-EECF99062239}" DTS:From="Package\Cargar DimTipoEntrada" DTS:To="Package\Cargar DimClub" DTS:LogicalAnd="True" DTS:ObjectName="Carga DW 9" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Carga DW 10]" DTS:CreationName="" DTS:DTSID="{0BB1B33D-EF50-4539-8941-0032B27F02BA}" DTS:From="Package\Cargar DimClub" DTS:To="Package\Cargar FactVentas" DTS:LogicalAnd="True" DTS:ObjectName="Carga DW 10" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Ventas a asistencia]" DTS:CreationName="" DTS:DTSID="{2DC5561C-1A4B-455A-8542-B0C0A4104109}" DTS:From="Package\Cargar FactVentas" DTS:To="Package\Cargar FactAsistencia" DTS:LogicalAnd="True" DTS:ObjectName="Ventas a asistencia" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Carga DW 11]" DTS:CreationName="" DTS:DTSID="{191A0416-A102-4C0B-98FB-8274702A091F}" DTS:From="Package\Cargar FactAsistencia" DTS:To="Package\Liberar staging" DTS:LogicalAnd="True" DTS:ObjectName="Carga DW 11" />
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Configurar sesión DW]" DTS:CreationName="" DTS:DTSID="{00DC4A05-A0F2-430D-951B-46DB2BF02D42}" DTS:From="Package\Configurar sesión DW" DTS:To="Package\Cargar DimTiempo" DTS:LogicalAnd="True" DTS:ObjectName="Configurar sesión DW" />
+  </DTS:PrecedenceConstraints>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<Objects Version="8">
+  <Package design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout Capacity="32"
+        xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph"
+        xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph"
+        xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout Size="192,42" Id="Package\Preparar staging" TopLeft="32,24" />
+        <NodeLayout Size="192,42" Id="Package\Extraer Partidos" TopLeft="276,24" />
+        <NodeLayout Size="192,42" Id="Package\Extraer Boletos" TopLeft="520,24" />
+        <NodeLayout Size="192,42" Id="Package\Extraer Asistencia" TopLeft="520,97" />
+        <NodeLayout Size="192,42" Id="Package\Configurar sesión DW" TopLeft="276,97" />
+        <NodeLayout Size="192,42" Id="Package\Cargar DimTiempo" TopLeft="32,176" />
+        <NodeLayout Size="192,42" Id="Package\Cargar DimTemporada" TopLeft="520,176" />
+        <NodeLayout Size="192,42" Id="Package\Cargar DimEstadio" TopLeft="520,249" />
+        <NodeLayout Size="192,42" Id="Package\Cargar DimCompeticion" TopLeft="32,249" />
+        <NodeLayout Size="192,42" Id="Package\Cargar DimTipoEntrada" TopLeft="32,322" />
+        <NodeLayout Size="192,42" Id="Package\Cargar DimClub" TopLeft="520,322" />
+        <NodeLayout Size="192,42" Id="Package\Cargar FactVentas" TopLeft="520,406" />
+        <NodeLayout Size="192,42" Id="Package\Cargar FactAsistencia" TopLeft="276,406" />
+        <NodeLayout Size="192,42" Id="Package\Liberar staging" TopLeft="32,406" />
+        <EdgeLayout Id="Package.PrecedenceConstraints[Secuencia 1]" TopLeft="224,45">
+          <EdgeLayout.Curve>
+            <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="52,0"
+              Start="0,0" End="44.5,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection Capacity="1">
+                  <mssgle:LineSegment End="44.5,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout Id="Package.PrecedenceConstraints[Secuencia 2]" TopLeft="468,45">
+          <EdgeLayout.Curve>
+            <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="52,0"
+              Start="0,0" End="44.5,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection Capacity="1">
+                  <mssgle:LineSegment End="44.5,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout Id="Package.PrecedenceConstraints[Secuencia 3]" TopLeft="616,66">
+          <EdgeLayout.Curve>
+            <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="0,31"
+              Start="0,0" End="0,23.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection Capacity="1">
+                  <mssgle:LineSegment End="0,23.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout Id="Package.PrecedenceConstraints[Carga DW 4]" TopLeft="520,118">
+          <EdgeLayout.Curve>
+            <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="-52,0"
+              Start="0,0" End="-44.5,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection Capacity="1">
+                  <mssgle:LineSegment End="-44.5,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout Id="Package.PrecedenceConstraints[Carga DW 5]" TopLeft="224,197">
+          <EdgeLayout.Curve>
+            <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="296,0"
+              Start="0,0" End="288.5,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection Capacity="1">
+                  <mssgle:LineSegment End="288.5,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout Id="Package.PrecedenceConstraints[Carga DW 6]" TopLeft="616,218">
+          <EdgeLayout.Curve>
+            <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="0,31"
+              Start="0,0" End="0,23.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection Capacity="1">
+                  <mssgle:LineSegment End="0,23.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout Id="Package.PrecedenceConstraints[Carga DW 7]" TopLeft="520,270">
+          <EdgeLayout.Curve>
+            <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="-296,0"
+              Start="0,0" End="-288.5,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection Capacity="1">
+                  <mssgle:LineSegment End="-288.5,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout Id="Package.PrecedenceConstraints[Carga DW 8]" TopLeft="128,291">
+          <EdgeLayout.Curve>
+            <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="0,31"
+              Start="0,0" End="0,23.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection Capacity="1">
+                  <mssgle:LineSegment End="0,23.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout Id="Package.PrecedenceConstraints[Carga DW 9]" TopLeft="224,343">
+          <EdgeLayout.Curve>
+            <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="296,0"
+              Start="0,0" End="288.5,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection Capacity="1">
+                  <mssgle:LineSegment End="288.5,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout Id="Package.PrecedenceConstraints[Carga DW 10]" TopLeft="616,364">
+          <EdgeLayout.Curve>
+            <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="0,42"
+              Start="0,0" End="0,34.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection Capacity="1">
+                  <mssgle:LineSegment End="0,34.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout Id="Package.PrecedenceConstraints[Ventas a asistencia]" TopLeft="520,427">
+          <EdgeLayout.Curve>
+            <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="-52,0"
+              Start="0,0" End="-44.5,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection Capacity="1">
+                  <mssgle:LineSegment End="-44.5,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout Id="Package.PrecedenceConstraints[Carga DW 11]" TopLeft="276,427">
+          <EdgeLayout.Curve>
+            <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="-52,0"
+              Start="0,0" End="-44.5,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection Capacity="1">
+                  <mssgle:LineSegment End="-44.5,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout Id="Package.PrecedenceConstraints[Configurar sesión DW]" TopLeft="372,139">
+          <EdgeLayout.Curve>
+            <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="-244,37"
+              Start="0,0" End="-244,29.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection Capacity="5">
+                  <mssgle:LineSegment End="0,14.5" />
+                  <mssgle:CubicBezierSegment Point1="0,14.5" Point2="0,18.5" Point3="-4,18.5" />
+                  <mssgle:LineSegment End="-240,18.5" />
+                  <mssgle:CubicBezierSegment Point1="-240,18.5" Point2="-244,18.5" Point3="-244,22.5" />
+                  <mssgle:LineSegment End="-244,29.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>

@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<SSIS:Parameters xmlns:SSIS="www.microsoft.com/SqlServer/SSIS">
+  <SSIS:Parameter SSIS:Name="ServidorOrigen">
+    <SSIS:Properties>
+      <SSIS:Property SSIS:Name="ID">{1C1EFCD0-B206-42D6-8C97-6911DBAE0FBE}</SSIS:Property>
+      <SSIS:Property SSIS:Name="CreationName" />
+      <SSIS:Property SSIS:Name="Description" />
+      <SSIS:Property SSIS:Name="IncludeInDebugDump">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Required">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Sensitive">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Value">(local)</SSIS:Property>
+      <SSIS:Property SSIS:Name="DataType">18</SSIS:Property>
+    </SSIS:Properties>
+  </SSIS:Parameter>
+  <SSIS:Parameter SSIS:Name="ServidorDWStaging">
+    <SSIS:Properties>
+      <SSIS:Property SSIS:Name="ID">{CDAAF892-FAE6-4349-BC4B-7A6EF2C4D5A4}</SSIS:Property>
+      <SSIS:Property SSIS:Name="CreationName" />
+      <SSIS:Property SSIS:Name="Description" />
+      <SSIS:Property SSIS:Name="IncludeInDebugDump">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Required">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Sensitive">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Value">(local)</SSIS:Property>
+      <SSIS:Property SSIS:Name="DataType">18</SSIS:Property>
+    </SSIS:Properties>
+  </SSIS:Parameter>
+  <SSIS:Parameter SSIS:Name="BaseOrigen">
+    <SSIS:Properties>
+      <SSIS:Property SSIS:Name="ID">{06A00486-B387-4D61-BC71-45BAA2477355}</SSIS:Property>
+      <SSIS:Property SSIS:Name="CreationName" />
+      <SSIS:Property SSIS:Name="Description" />
+      <SSIS:Property SSIS:Name="IncludeInDebugDump">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Required">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Sensitive">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Value">LigasdeAscenso</SSIS:Property>
+      <SSIS:Property SSIS:Name="DataType">18</SSIS:Property>
+    </SSIS:Properties>
+  </SSIS:Parameter>
+  <SSIS:Parameter SSIS:Name="BaseStaging">
+    <SSIS:Properties>
+      <SSIS:Property SSIS:Name="ID">{45118857-42F7-480F-B6C3-2A3A1A4FCD38}</SSIS:Property>
+      <SSIS:Property SSIS:Name="CreationName" />
+      <SSIS:Property SSIS:Name="Description" />
+      <SSIS:Property SSIS:Name="IncludeInDebugDump">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Required">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Sensitive">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Value">Staging_Ligas</SSIS:Property>
+      <SSIS:Property SSIS:Name="DataType">18</SSIS:Property>
+    </SSIS:Properties>
+  </SSIS:Parameter>
+  <SSIS:Parameter SSIS:Name="BaseDW">
+    <SSIS:Properties>
+      <SSIS:Property SSIS:Name="ID">{683AF0EF-F249-44DE-8BE8-12D358D8AB91}</SSIS:Property>
+      <SSIS:Property SSIS:Name="CreationName" />
+      <SSIS:Property SSIS:Name="Description" />
+      <SSIS:Property SSIS:Name="IncludeInDebugDump">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Required">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Sensitive">0</SSIS:Property>
+      <SSIS:Property SSIS:Name="Value">DW_LigasdeAscenso</SSIS:Property>
+      <SSIS:Property SSIS:Name="DataType">18</SSIS:Property>
+    </SSIS:Properties>
+  </SSIS:Parameter>
+</SSIS:Parameters>

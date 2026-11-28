@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts" DTS:ObjectName="CM_Staging" DTS:DTSID="{AB120B29-1A2E-4C16-A2CC-3ABC748CD459}" DTS:CreationName="OLEDB">
+  <DTS:PropertyExpression DTS:Name="ConnectionString">"Provider=MSOLEDBSQL;Data Source=" + @[$Project::ServidorDWStaging] + ";Initial Catalog=" + @[$Project::BaseStaging] + ";Integrated Security=SSPI;Auto Translate=False;"</DTS:PropertyExpression>
+  <DTS:ObjectData>
+    <DTS:ConnectionManager DTS:ConnectionString="Provider=MSOLEDBSQL;Data Source=(local);Initial Catalog=Staging_Ligas;Integrated Security=SSPI;Auto Translate=False;" DTS:Retain="True" />
+  </DTS:ObjectData>
+</DTS:ConnectionManager>
