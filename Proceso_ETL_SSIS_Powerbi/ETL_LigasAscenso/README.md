@@ -1,4 +1,4 @@
-ETL de Ligas de Ascenso 
+ETL de Ligas de Ascenso (Copa Perú y Liga 2)
 
 Este proyecto implementa el flujo de extracción, transformación y carga (ETL) para la plataforma de Inteligencia de Negocios y Análisis de Taquilla del Fútbol de Ascenso Peruano. El proceso extrae la información transaccional, la consolida en una base de datos intermedia (Staging), alimenta seis dimensiones y puebla dos tablas de hechos dentro de DW_LigasdeAscenso.
 
